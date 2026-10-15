@@ -1,0 +1,55 @@
+name: Bilete ieftine din Chișinău
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # zilnic la 06:00 UTC (09:00 ora Chișinăului vara, 08:00 iarna)
+  workflow_dispatch:       # buton "Run workflow" pentru rulare manuală
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # prețurile de ieri, ca să marcăm scumpirile/ieftinirile (🔻 / 🆕)
+      - name: Restaurează prețurile anterioare
+        uses: actions/cache/restore@v4
+        with:
+          path: last_prices.json
+          key: last-prices-${{ github.run_id }}
+          restore-keys: last-prices-
+
+      - name: Caută bilete și trimite pe Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
+          DAYS_AHEAD: ${{ vars.DAYS_AHEAD || '180' }}
+          TRIP_MIN_DAYS: ${{ vars.TRIP_MIN_DAYS || '2' }}
+          TRIP_MAX_DAYS: ${{ vars.TRIP_MAX_DAYS || '14' }}
+          MAX_PRICE_EUR: ${{ vars.MAX_PRICE_EUR || '0' }}
+          TOP_N: ${{ vars.TOP_N || '15' }}
+        run: python search_tickets.py
+
+      - name: Salvează prețurile de azi
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: last_prices.json
+          key: last-prices-${{ github.run_id }}
+
+      - name: Rezultate complete
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rezultate
+          path: last_results.json
+          retention-days: 7
