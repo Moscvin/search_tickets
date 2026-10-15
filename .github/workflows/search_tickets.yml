@@ -2,7 +2,7 @@ name: Bilete ieftine din Chișinău
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # zilnic la 06:00 UTC (09:00 ora Chișinăului vara, 08:00 iarna)
+    - cron: "0 6 * * 1"   # în fiecare luni la 06:00 UTC (09:00 ora Chișinăului vara, 08:00 iarna)
   workflow_dispatch:       # buton "Run workflow" pentru rulare manuală
 
 jobs:

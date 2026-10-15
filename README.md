@@ -1,6 +1,6 @@
 # Bilete ieftine din Chișinău → Telegram
 
-Caută zilnic cele mai ieftine bilete **dus-întors** din Chișinău (RMO) în orice direcție și trimite pe Telegram
+Caută săptămânal (lunea) cele mai ieftine bilete **dus-întors** din Chișinău (RMO) în orice direcție și trimite pe Telegram
 top destinații cu preț total, datele dus/întors, companie și link de rezervare.
 Plecarea în următoarele 180 de zile, întoarcerea după 2–7 zile.
 
@@ -21,7 +21,7 @@ Dusul și întorsul se pot combina între companii și între aeroporturile acel
 2. Scrie-i ceva botului tău, apoi deschide `https://api.telegram.org/bot<TOKEN>/getUpdates`
    și ia `"chat":{"id": ...}` → acesta e **chat id-ul**.
 
-## 2. GitHub Actions (rulează zilnic, gratuit)
+## 2. GitHub Actions (rulează în fiecare luni, gratuit)
 1. Urcă proiectul într-un repo pe GitHub.
 2. **Settings → Secrets and variables → Actions → New repository secret**:
    `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (și opțional `TRAVELPAYOUTS_TOKEN`).
