@@ -671,7 +671,8 @@ def fmt_date(iso: str) -> str:
 
 def leg_line(arrow: str, f: Flight) -> str:
     stop = "" if f.direct else " · cu escală"
-    return (f"   {arrow} {fmt_date(f.date)} · {f.airport} · {html.escape(f.airline)}{stop} · €{f.price_eur:.0f} · "
+    return (f"   {arrow} {fmt_date(f.date)} · {f.origin} → {f.destination} · {html.escape(f.airline)}{stop} · "
+            f"€{f.price_eur:.0f} · "
             f"<a href=\"{html.escape(f.link)}\">bilet</a>")
 
 
@@ -686,7 +687,8 @@ def trip_lines(top: list[Trip], previous: dict) -> list[str]:
             trend = f" 🔻 (era €{old:.0f})"
         nights = (dt.date.fromisoformat(t.back.date if t.back else t.out.return_date)
                   - dt.date.fromisoformat(t.out.date)).days
-        line = (f"{i}. <b>{html.escape(t.place_name)}</b> ({t.place}) — "
+        home_name = html.escape(ORIGIN_NAMES.get(t.home, t.home))
+        line = (f"{i}. <b>{home_name} → {html.escape(t.place_name)}</b> — "
                 f"<b>€{t.total_eur:.0f} dus-întors</b>{trend} · {nights} nopți\n")
         if t.back:
             line += leg_line("🛫", t.out) + "\n" + leg_line("🛬", t.back)
@@ -694,8 +696,9 @@ def trip_lines(top: list[Trip], previous: dict) -> list[str]:
                 line += f"\n   🔗 <a href=\"{html.escape(t.link)}\">Rezervă dus-întors</a>"
         else:
             stop = "" if t.out.direct else " · cu escală"
-            line += (f"   🛫 {fmt_date(t.out.date)} → 🛬 {fmt_date(t.out.return_date)} · {t.out.airport} · "
-                     f"{html.escape(t.out.airline)}{stop}\n"
+            line += (f"   🛫 {fmt_date(t.out.date)} · {t.home} → {t.out.airport}\n"
+                     f"   🛬 {fmt_date(t.out.return_date)} · {t.out.airport} → {t.home}\n"
+                     f"   ✈️ {html.escape(t.out.airline)}{stop}\n"
                      f"   🔗 <a href=\"{html.escape(t.out.link)}\">Rezervă</a>")
         lines.append(line)
     return lines
