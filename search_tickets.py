@@ -23,6 +23,7 @@ import sys
 import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
+from urllib.parse import urlencode
 
 from curl_cffi import requests
 
@@ -211,12 +212,21 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
     headers = {"origin": "https://bookings.flyone.eu", "referer": "https://bookings.flyone.eu/",
                "authorization": f"Bearer {token}"}
 
+    flyone_names: dict[str, str] = {}  # pagina FareCalendar nu se deschide fără numele orașelor
     try:
         routes = s.post(f"{api}/Routes/get-routes", json={}, headers=headers).json().get("routes") or []
         for rt in routes:
+            flyone_names[rt["depCode"]] = rt["depAirportName"].strip()
             names.setdefault(rt["depCode"], rt["depAirportName"].strip())
     except Exception as e:  # noqa: BLE001
         log.warning("FlyOne: nu am putut lua lista de aeroporturi: %s", e)
+
+    def link(org: str, dst: str, date: str) -> str:
+        return "https://bookings.flyone.eu/FareCalendar?" + urlencode({
+            "depCityName": flyone_names.get(org, org), "depCity": org,
+            "arrCityName": flyone_names.get(dst, dst), "arrCity": dst,
+            "startDate": date, "endDate": date,
+        })
 
     months = month_starts(TODAY, LAST_DATE)
 
@@ -268,7 +278,7 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
                         flights.append(Flight(
                             airline="FlyOne", origin=org, destination=dst, date=date,
                             price_eur=to_eur(price, direction.get("currency") or "EUR", rates),
-                            link=f"https://bookings.flyone.eu/FareCalendar?depCity={org}&arrCity={dst}",
+                            link=link(org, dst, date),
                             direct=direct,
                         ))
             time.sleep(0.3)
