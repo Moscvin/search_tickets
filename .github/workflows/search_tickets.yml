@@ -37,6 +37,7 @@ jobs:
           TRIP_MAX_DAYS: ${{ vars.TRIP_MAX_DAYS || '7' }}
           MAX_PRICE_EUR: ${{ vars.MAX_PRICE_EUR || '0' }}
           TOP_N: ${{ vars.TOP_N || '15' }}
+          KIWI_DESTINATIONS: ${{ vars.KIWI_DESTINATIONS }}
         run: python search_tickets.py
 
       - name: Salvează prețurile de azi
