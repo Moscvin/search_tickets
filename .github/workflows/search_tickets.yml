@@ -1,14 +1,19 @@
-name: Bilete ieftine din Chișinău
+name: Bilete ieftine din Chișinău, Iași, București
 
 on:
   schedule:
     - cron: "0 6 * * 1"   # în fiecare luni la 06:00 UTC (09:00 ora Chișinăului vara, 08:00 iarna)
   workflow_dispatch:       # buton "Run workflow" pentru rulare manuală
 
+# o singură căutare odată: rulări paralele fac ca Wizz Air să blocheze cererile
+concurrency:
+  group: search-tickets
+  cancel-in-progress: false
+
 jobs:
   search:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -36,6 +41,7 @@ jobs:
           TRIP_MIN_DAYS: ${{ vars.TRIP_MIN_DAYS || '2' }}
           TRIP_MAX_DAYS: ${{ vars.TRIP_MAX_DAYS || '7' }}
           MAX_PRICE_EUR: ${{ vars.MAX_PRICE_EUR || '0' }}
+          ORIGINS: ${{ vars.ORIGINS || 'RMO,IAS,OTP' }}
           TOP_N: ${{ vars.TOP_N || '15' }}
           KIWI_DESTINATIONS: ${{ vars.KIWI_DESTINATIONS }}
         run: python search_tickets.py

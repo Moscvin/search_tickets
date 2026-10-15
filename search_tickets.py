@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Caută bilete de avion ieftine dus-întors din Chișinău (RMO) în orice direcție și trimite
-un rezumat pe Telegram.
+"""Caută bilete de avion ieftine dus-întors din Chișinău, Iași și București în orice direcție
+și trimite un rezumat pe Telegram (câte o listă pentru fiecare oraș de plecare).
 
-Surse: Wizz Air, FlyOne, HiSky, SkyUp (direct de pe site-urile lor), Kiwi.com pentru celelalte
-companii (Turkish, Pegasus, AJet, LOT, Lufthansa...) și opțional Aviasales/Travelpayouts.
+Surse: Wizz Air, Ryanair, FlyOne, HiSky, SkyUp (direct de pe site-urile lor), Kiwi.com pentru
+celelalte companii (Turkish, Pegasus, LOT, Lufthansa, TAROM...) și opțional Aviasales/Travelpayouts.
 
 Pentru fiecare destinație se caută cea mai ieftină combinație dus + întors, cu întoarcerea
 la TRIP_MIN_DAYS..TRIP_MAX_DAYS zile după plecare. Se pot combina companii diferite și aeroporturi
@@ -28,7 +28,6 @@ from urllib.parse import urlencode
 
 from curl_cffi import requests
 
-ORIGIN = "RMO"
 BASE_DIR = Path(__file__).resolve().parent
 STATE_FILE = BASE_DIR / "last_prices.json"
 
@@ -55,15 +54,19 @@ def env_int(name: str, default: int) -> int:
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 TRAVELPAYOUTS_TOKEN = os.environ.get("TRAVELPAYOUTS_TOKEN", "")
+# Orașele de plecare (coduri de aeroport), în ordinea în care apar în mesaj
+ORIGINS = [o.strip().upper() for o in (os.environ.get("ORIGINS") or "RMO,IAS,OTP").split(",") if o.strip()]
 DAYS_AHEAD = env_int("DAYS_AHEAD", 180)         # plecarea: în următoarele N zile
 TRIP_MIN_DAYS = env_int("TRIP_MIN_DAYS", 2)     # întoarcerea: minim N zile după plecare
-TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 7)    # întoarcerea: maxim N zile după plecare
+TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 7)     # întoarcerea: maxim N zile după plecare
 MAX_PRICE_EUR = float(os.environ.get("MAX_PRICE_EUR") or 0)  # preț total maxim, 0 = fără limită
-TOP_N = env_int("TOP_N", 15)
+TOP_N = env_int("TOP_N", 15)                    # câte destinații pentru fiecare oraș de plecare
 
 TODAY = dt.date.today()
 LAST_OUTBOUND = TODAY + dt.timedelta(days=DAYS_AHEAD)
 LAST_DATE = LAST_OUTBOUND + dt.timedelta(days=TRIP_MAX_DAYS)  # orizontul de căutare pentru întoarceri
+
+ORIGIN_NAMES = {"RMO": "Chișinău", "IAS": "Iași", "OTP": "București", "BBU": "București", "SCV": "Suceava"}
 
 # Aeroporturi din același oraș: dus și întors se pot combina între ele
 # (ex. dus la Milano Bergamo cu Wizz, întors din Milano Malpensa cu FlyOne).
@@ -82,14 +85,15 @@ CITY_AIRPORTS = {
     "WAW": ("Varșovia", ["WAW", "WMI"]),
     "BCN": ("Barcelona", ["BCN", "GRO", "REU"]),
     "OSL": ("Oslo", ["OSL", "TRF", "RYG"]),
+    "BUH": ("București", ["OTP", "BBU"]),
 }
 AIRPORT_CITY = {airport: city for city, (_, airports) in CITY_AIRPORTS.items() for airport in airports}
 
-
 # Nume pentru aeroporturile pe care sursele le dau doar ca cod sau ca nume de aeroport
 AIRPORT_NAMES = {
-    "OTP": "București", "OMR": "Oradea", "CLJ": "Cluj-Napoca", "TSR": "Timișoara", "IAS": "Iași",
+    "OMR": "Oradea", "CLJ": "Cluj-Napoca", "TSR": "Timișoara", "IAS": "Iași", "RMO": "Chișinău",
     "HAM": "Hamburg", "PMF": "Parma", "GYD": "Baku", "SSH": "Sharm El Sheikh", "BUS": "Batumi",
+    "SBZ": "Sibiu", "CND": "Constanța", "SCV": "Suceava", "BCM": "Bacău", "CRA": "Craiova",
 }
 
 
@@ -103,20 +107,25 @@ def city_name(city: str, names: dict) -> str:
 
 @dataclass
 class Flight:
-    """Un zbor într-o direcție (RMO → X sau X → RMO)."""
+    """Un zbor într-o direcție, între orașul de plecare `home` și o destinație."""
     airline: str
     origin: str
     destination: str
     date: str  # YYYY-MM-DD
     price_eur: float
     link: str
+    home: str  # aeroportul de plecare al călătoriei (RMO / IAS / OTP)
     direct: bool = True
     return_date: str = ""  # setat doar pentru oferte dus-întors vândute împreună (Kiwi, Aviasales)
 
     @property
+    def outbound(self) -> bool:
+        return self.origin == self.home
+
+    @property
     def airport(self) -> str:
-        """Aeroportul de la celălalt capăt (nu Chișinău)."""
-        return self.destination if self.origin == ORIGIN else self.origin
+        """Aeroportul de la celălalt capăt (destinația călătoriei)."""
+        return self.destination if self.outbound else self.origin
 
     @property
     def place(self) -> str:
@@ -125,6 +134,7 @@ class Flight:
 
 @dataclass
 class Trip:
+    home: str
     place: str
     place_name: str
     out: Flight
@@ -172,8 +182,8 @@ def wizz_link(org: str, dst: str, date: str, ret: str = "null") -> str:
 # --------------------------------------------------------------------------- Wizz Air
 
 def search_wizzair(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
-    home = s.get("https://wizzair.com/en-gb").text
-    m = re.search(r"be\.wizzair\.com/([0-9.]+)/Api", home)
+    home_page = s.get("https://wizzair.com/en-gb").text
+    m = re.search(r"be\.wizzair\.com/([0-9.]+)/Api", home_page)
     if not m:
         raise RuntimeError("nu am găsit versiunea API Wizz Air")
     api = f"https://be.wizzair.com/{m.group(1)}/Api"
@@ -183,11 +193,6 @@ def search_wizzair(s: requests.Session, rates: dict, names: dict) -> list[Flight
     by_iata = {c["iata"]: c for c in cities}
     for c in cities:
         names.setdefault(c["iata"], c["shortName"].strip())
-    destinations = [
-        c["iata"] for c in by_iata[ORIGIN]["connections"]
-        if not by_iata.get(c["iata"], {}).get("isFakeStation")  # sar peste "Londra (toate aeroporturile)" etc.
-    ]
-    log.info("Wizz Air: %d destinații din %s", len(destinations), ORIGIN)
 
     def timetable(body: dict) -> dict:
         # Wizz răspunde cu 429/503 dacă facem cereri prea repede: așteptăm și reîncercăm
@@ -204,40 +209,101 @@ def search_wizzair(s: requests.Session, rates: dict, names: dict) -> list[Flight
         return {}
 
     flights = []
-    consecutive_failures = 0
-    for dest in destinations:
-        if consecutive_failures >= 4:
-            raise RuntimeError(f"Wizz Air blochează cererile ({consecutive_failures} eșecuri la rând)")
-        start = TODAY
-        while start <= LAST_DATE:
-            end = min(start + dt.timedelta(days=41), LAST_DATE)  # Wizz acceptă maxim ~42 de zile pe cerere
-            period = {"from": start.isoformat(), "to": end.isoformat()}
-            body = {
-                "flightList": [{"departureStation": ORIGIN, "arrivalStation": dest, **period},
-                               {"departureStation": dest, "arrivalStation": ORIGIN, **period}],
-                "priceType": "regular", "adultCount": 1, "childCount": 0, "infantCount": 0,
+    for home in ORIGINS:
+        if home not in by_iata:
+            continue
+        destinations = [
+            c["iata"] for c in by_iata[home]["connections"]
+            if not by_iata.get(c["iata"], {}).get("isFakeStation")  # sar peste "Londra (toate aeroporturile)" etc.
+        ]
+        log.info("Wizz Air: %d destinații din %s", len(destinations), home)
+        consecutive_failures = 0
+        for dest in destinations:
+            if consecutive_failures >= 4:
+                raise RuntimeError(f"Wizz Air blochează cererile ({consecutive_failures} eșecuri la rând)")
+            start = TODAY
+            while start <= LAST_DATE:
+                end = min(start + dt.timedelta(days=41), LAST_DATE)  # Wizz acceptă maxim ~42 de zile pe cerere
+                period = {"from": start.isoformat(), "to": end.isoformat()}
+                body = {
+                    "flightList": [{"departureStation": home, "arrivalStation": dest, **period},
+                                   {"departureStation": dest, "arrivalStation": home, **period}],
+                    "priceType": "regular", "adultCount": 1, "childCount": 0, "infantCount": 0,
+                }
+                try:
+                    data = timetable(body)
+                    consecutive_failures = 0
+                    for f in (data.get("outboundFlights") or []) + (data.get("returnFlights") or []):
+                        price = f.get("price") or {}
+                        if not price.get("amount") or f.get("priceType") == "soldOut":
+                            continue
+                        date = f["departureDate"][:10]
+                        org, dst = f["departureStation"], f["arrivalStation"]
+                        flights.append(Flight(
+                            airline="Wizz Air", origin=org, destination=dst, date=date, home=home,
+                            price_eur=to_eur(price["amount"], price["currencyCode"], rates),
+                            link=wizz_link(org, dst, date),
+                        ))
+                except Exception as e:  # noqa: BLE001
+                    consecutive_failures += 1
+                    log.warning("Wizz Air %s-%s: %s", home, dest, e)
+                    break
+                start = end + dt.timedelta(days=1)
+                time.sleep(2)
+    log.info("Wizz Air: %d prețuri", len(flights))
+    return flights
+
+
+# --------------------------------------------------------------------------- Ryanair
+
+def ryanair_link(org: str, dst: str, date: str, back: str = "") -> str:
+    return "https://www.ryanair.com/gb/en/trip/flights/select?" + urlencode({
+        "adults": 1, "teens": 0, "children": 0, "infants": 0, "dateOut": date, "dateIn": back,
+        "isConnectedFlight": "false", "isReturn": "true" if back else "false", "discount": 0,
+        "originIata": org, "destinationIata": dst,
+    })
+
+
+def search_ryanair(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
+    flights = []
+    for home in ORIGINS:
+        r = s.get(f"https://www.ryanair.com/api/views/locate/searchWidget/routes/en/airport/{home}")
+        if r.status_code == 404:  # Ryanair nu zboară din acest aeroport (ex. Chișinău)
+            continue
+        r.raise_for_status()
+        routes = [rt["arrivalAirport"] for rt in r.json() if rt.get("operator") == "FR"]
+        for a in routes:
+            names.setdefault(a["code"], a["city"]["name"])
+        log.info("Ryanair: %d destinații din %s", len(routes), home)
+        for a in routes:
+            dest = a["code"]
+            # cel mai ieftin dus-întors de TRIP_MIN_DAYS..TRIP_MAX_DAYS zile pe această rută
+            params = {
+                "departureAirportIataCode": home, "arrivalAirportIataCode": dest,
+                "outboundDepartureDateFrom": TODAY.isoformat(), "outboundDepartureDateTo": LAST_OUTBOUND.isoformat(),
+                "inboundDepartureDateFrom": TODAY.isoformat(), "inboundDepartureDateTo": LAST_DATE.isoformat(),
+                "durationFrom": TRIP_MIN_DAYS, "durationTo": TRIP_MAX_DAYS,
+                "currency": "EUR", "market": "en-gb", "adultPaxCount": 1,
             }
             try:
-                data = timetable(body)
-                consecutive_failures = 0
-                for f in (data.get("outboundFlights") or []) + (data.get("returnFlights") or []):
-                    price = f.get("price") or {}
-                    if not price.get("amount") or f.get("priceType") == "soldOut":
-                        continue
-                    date = f["departureDate"][:10]
-                    org, dst = f["departureStation"], f["arrivalStation"]
-                    flights.append(Flight(
-                        airline="Wizz Air", origin=org, destination=dst, date=date,
-                        price_eur=to_eur(price["amount"], price["currencyCode"], rates),
-                        link=wizz_link(org, dst, date),
-                    ))
+                rr = s.get("https://services-api.ryanair.com/farfnd/v4/roundTripFares", params=params)
+                rr.raise_for_status()
+                fares = rr.json().get("fares") or []
             except Exception as e:  # noqa: BLE001
-                consecutive_failures += 1
-                log.warning("Wizz Air %s-%s: %s", ORIGIN, dest, e)
-                break
-            start = end + dt.timedelta(days=1)
-            time.sleep(2)
-    log.info("Wizz Air: %d prețuri", len(flights))
+                log.warning("Ryanair %s-%s: %s", home, dest, e)
+                continue
+            # cele două zboruri intră separat, ca să poată fi combinate și cu alte companii
+            for fare in fares:
+                for leg in (fare["outbound"], fare["inbound"]):
+                    org, dst = leg["departureAirport"]["iataCode"], leg["arrivalAirport"]["iataCode"]
+                    date = leg["departureDate"][:10]
+                    flights.append(Flight(
+                        airline="Ryanair", origin=org, destination=dst, date=date, home=home,
+                        price_eur=to_eur(leg["price"]["value"], leg["price"]["currencyCode"], rates),
+                        link=ryanair_link(org, dst, date),
+                    ))
+            time.sleep(0.3)
+    log.info("Ryanair: %d prețuri", len(flights))
     return flights
 
 
@@ -270,59 +336,60 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
         })
 
     months = month_starts(TODAY, LAST_DATE)
-
-    # 1) destinațiile care au tarife (cel mai mic preț pe destinație, pe lună)
-    destinations: dict[str, bool] = {}  # destinație -> zbor direct
-    for month in months:
-        body = {"token": token, "origin": ORIGIN, "travelDate": max(month, TODAY).isoformat(), "currencyCode": "EUR"}
-        r = s.post(f"{api}/search/get-route-fare", json=body, headers=headers)
-        r.raise_for_status()
-        for f in r.json().get("destinationFares") or []:
-            destinations.setdefault(f["destination"], f.get("connType") == 1)
-        time.sleep(0.3)
-    log.info("FlyOne: %d destinații din %s", len(destinations), ORIGIN)
-
-    # 2) calendarul de prețuri pe zile, dus și întors, pentru fiecare destinație și lună
     flights = []
-    for dest, direct in destinations.items():
+    for home in ORIGINS:
+        # 1) destinațiile care au tarife (cel mai mic preț pe destinație, pe lună)
+        destinations: dict[str, bool] = {}  # destinație -> zbor direct
         for month in months:
-            travel = max(month, TODAY).isoformat()
-            body = {
-                "currencyCode": "EUR",
-                "searchCriteria": {
-                    "paxInfo": [{"paxType": 1, "paxKey": "Adult1"}],
-                    "journeyInfo": {"journeyType": 2, "routeInfo": [
-                        {"depCity": ORIGIN, "arrCity": dest, "travelDate": travel},
-                        {"depCity": dest, "arrCity": ORIGIN, "travelDate": travel},
-                    ]},
-                },
-                "qsParams": [{"key": "", "value": ""}], "languageCode": "en-GB", "currency": "EUR",
-                "paxInfoId": 0, "reservationType": 0, "userAgent": "Mozilla/5.0", "personKey": "",
-            }
-            try:
-                r = s.post(f"{api}/search/fare-calendar-schedule", json=body, headers=headers)
-                r.raise_for_status()
-                schedule = r.json().get("flightSchedule") or []
-            except Exception as e:  # noqa: BLE001
-                log.warning("FlyOne %s %s: %s", dest, travel[:7], e)
-                continue
-            for direction in schedule:
-                org, dst = (ORIGIN, dest) if direction["direction"] == 1 else (dest, ORIGIN)
-                for mon in direction["month"]:
-                    for day in mon["days"]:
-                        price = float(day.get("price") or 0)
-                        if not day.get("isFlightAvailable") or day.get("isSoldOut") or price <= 0:
-                            continue
-                        date = f"{direction['year']}-{int(mon['month']):02d}-{int(day['date']):02d}"
-                        if not in_range(date):
-                            continue
-                        flights.append(Flight(
-                            airline="FlyOne", origin=org, destination=dst, date=date,
-                            price_eur=to_eur(price, direction.get("currency") or "EUR", rates),
-                            link=link(org, dst, date),
-                            direct=direct,
-                        ))
+            body = {"token": token, "origin": home, "travelDate": max(month, TODAY).isoformat(), "currencyCode": "EUR"}
+            r = s.post(f"{api}/search/get-route-fare", json=body, headers=headers)
+            r.raise_for_status()
+            for f in r.json().get("destinationFares") or []:
+                destinations.setdefault(f["destination"], f.get("connType") == 1)
             time.sleep(0.3)
+        if not destinations:
+            continue
+        log.info("FlyOne: %d destinații din %s", len(destinations), home)
+
+        # 2) calendarul de prețuri pe zile, dus și întors, pentru fiecare destinație și lună
+        for dest, direct in destinations.items():
+            for month in months:
+                travel = max(month, TODAY).isoformat()
+                body = {
+                    "currencyCode": "EUR",
+                    "searchCriteria": {
+                        "paxInfo": [{"paxType": 1, "paxKey": "Adult1"}],
+                        "journeyInfo": {"journeyType": 2, "routeInfo": [
+                            {"depCity": home, "arrCity": dest, "travelDate": travel},
+                            {"depCity": dest, "arrCity": home, "travelDate": travel},
+                        ]},
+                    },
+                    "qsParams": [{"key": "", "value": ""}], "languageCode": "en-GB", "currency": "EUR",
+                    "paxInfoId": 0, "reservationType": 0, "userAgent": "Mozilla/5.0", "personKey": "",
+                }
+                try:
+                    r = s.post(f"{api}/search/fare-calendar-schedule", json=body, headers=headers)
+                    r.raise_for_status()
+                    schedule = r.json().get("flightSchedule") or []
+                except Exception as e:  # noqa: BLE001
+                    log.warning("FlyOne %s-%s %s: %s", home, dest, travel[:7], e)
+                    continue
+                for direction in schedule:
+                    org, dst = (home, dest) if direction["direction"] == 1 else (dest, home)
+                    for mon in direction["month"]:
+                        for day in mon["days"]:
+                            price = float(day.get("price") or 0)
+                            if not day.get("isFlightAvailable") or day.get("isSoldOut") or price <= 0:
+                                continue
+                            date = f"{direction['year']}-{int(mon['month']):02d}-{int(day['date']):02d}"
+                            if not in_range(date):
+                                continue
+                            flights.append(Flight(
+                                airline="FlyOne", origin=org, destination=dst, date=date, home=home,
+                                price_eur=to_eur(price, direction.get("currency") or "EUR", rates),
+                                link=link(org, dst, date), direct=direct,
+                            ))
+                time.sleep(0.3)
     # răspunsurile pentru luni vecine se suprapun: păstrăm o singură intrare pe zbor
     flights = list({(f.origin, f.destination, f.date): f for f in flights}.values())
     log.info("FlyOne: %d prețuri", len(flights))
@@ -338,55 +405,22 @@ def search_hisky(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
                         page, re.S)
     flights = []
     for org, dst, raw in blocks:
-        if ORIGIN not in (org, dst):
-            continue
-        for f in json.loads(raw):
-            price = float(str(f["price"]).replace(",", ""))
-            date = dt.datetime.strptime(f["date"], "%d.%m.%Y").date()
-            if price <= 0 or not in_range(date.isoformat()):
+        for home in ORIGINS:
+            if home not in (org, dst):
                 continue
-            link = ("https://booking.hisky.aero/VARS/Public/deeplink.aspx?TripType=oneway&UserLanguage=ro"
-                    f"&Adult=1&Child=0&InfantLap=0&UserCurrency=EUR&Origin1={org}&Destination1={dst}"
-                    f"&DepartureDate1={date:%d.%m.%Y}")
-            flights.append(Flight(
-                airline="HiSky", origin=org, destination=dst, date=date.isoformat(),
-                price_eur=to_eur(price, "EUR", rates), link=link,
-            ))
+            for f in json.loads(raw):
+                price = float(str(f["price"]).replace(",", ""))
+                date = dt.datetime.strptime(f["date"], "%d.%m.%Y").date()
+                if price <= 0 or not in_range(date.isoformat()):
+                    continue
+                link = ("https://booking.hisky.aero/VARS/Public/deeplink.aspx?TripType=oneway&UserLanguage=ro"
+                        f"&Adult=1&Child=0&InfantLap=0&UserCurrency=EUR&Origin1={org}&Destination1={dst}"
+                        f"&DepartureDate1={date:%d.%m.%Y}")
+                flights.append(Flight(
+                    airline="HiSky", origin=org, destination=dst, date=date.isoformat(), home=home,
+                    price_eur=to_eur(price, "EUR", rates), link=link,
+                ))
     log.info("HiSky: %d prețuri", len(flights))
-    return flights
-
-
-# --------------------------------------------------------------------------- Aviasales (opțional)
-
-def search_aviasales(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
-    """Toate companiile (Turkish, Pegasus, AJet, LOT, Lufthansa...). Necesită TRAVELPAYOUTS_TOKEN gratuit.
-
-    Întoarce oferte dus-întors deja combinate (prețul e totalul pentru ambele zboruri)."""
-    if not TRAVELPAYOUTS_TOKEN:
-        log.info("Aviasales: sărit (nu e setat TRAVELPAYOUTS_TOKEN)")
-        return []
-    flights = []
-    for month in month_starts(TODAY, LAST_OUTBOUND):
-        r = s.get("https://api.travelpayouts.com/aviasales/v3/prices_for_dates", params={
-            "origin": ORIGIN, "departure_at": month.strftime("%Y-%m"), "one_way": "false", "direct": "false",
-            "sorting": "price", "currency": "eur", "limit": 1000, "token": TRAVELPAYOUTS_TOKEN,
-        })
-        r.raise_for_status()
-        for f in r.json().get("data") or []:
-            date = f["departure_at"][:10]
-            ret = (f.get("return_at") or "")[:10]
-            if not ret or not in_range(date):
-                continue
-            flights.append(Flight(
-                airline=f"Aviasales ({f.get('airline', '?')})", origin=ORIGIN,
-                destination=f.get("destination_airport") or f["destination"], date=date,
-                price_eur=to_eur(float(f["price"]), "EUR", rates),
-                link="https://www.aviasales.com" + f["link"] if f.get("link") else "https://www.aviasales.com",
-                direct=f.get("transfers", 0) == 0 and f.get("return_transfers", 0) == 0,
-                return_date=ret,
-            ))
-        time.sleep(0.4)
-    log.info("Aviasales: %d oferte dus-întors", len(flights))
     return flights
 
 
@@ -403,49 +437,51 @@ def search_skyup(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
     headers = {"origin": "https://skyup.aero", "referer": "https://skyup.aero/en"}
     connections = s.get("https://skyup.aero/api/v2/site/airport-connections?language=en&currency=EUR",
                         headers=headers).json()["connections"]
-    destinations = []
-    for c in connections:
-        if c["originAirport"]["airportCode"] == ORIGIN:
-            dest = c["destinationAirport"]
-            destinations.append(dest["airportCode"])
-            names.setdefault(dest["airportCode"], dest["cityName"])
-    log.info("SkyUp: %d destinații din %s", len(destinations), ORIGIN)
-
     flights = []
-    for dest in destinations:
-        # un singur apel întoarce calendarul pe zile pentru ambele direcții
-        body = {
-            "AirlineCode": "U5", "OriginCityCode": ORIGIN, "DestinationCityCode": dest,
-            "Date": TODAY.isoformat(), "EndDate": LAST_DATE.isoformat(), "needReturnFlights": True,
-            "originAndDestIsAirports": True, "TotalPaxCount": 1, "DayRange": 1,
-            "PaxCountDetails": [{"PaxType": "ADULT", "PaxCount": 1}], "PointOfPurchase": "PL",
-        }
-        try:
-            r = s.post("https://skyup.aero/api/site/calendar?language=en&currency=EUR", json=body, headers=headers)
-            r.raise_for_status()
-            data = r.json()
-        except Exception as e:  # noqa: BLE001
-            log.warning("SkyUp %s: %s", dest, e)
+    for home in ORIGINS:
+        destinations = []
+        for c in connections:
+            if c["originAirport"]["airportCode"] == home:
+                dest = c["destinationAirport"]
+                destinations.append(dest["airportCode"])
+                names.setdefault(dest["airportCode"], dest["cityName"])
+        if not destinations:
             continue
-        for key, org, dst in (("OnwardBestFareDetails", ORIGIN, dest), ("ReturnBestFareDetails", dest, ORIGIN)):
-            for f in data.get(key) or []:
-                date = f["flight_date"][:10]
-                if f.get("is_sold_out") or not f.get("display_amount") or not in_range(date):
-                    continue
-                flights.append(Flight(
-                    airline="SkyUp", origin=org, destination=dst, date=date,
-                    price_eur=to_eur(float(f["display_amount"]), f.get("currency_code") or "EUR", rates),
-                    link=skyup_link(org, dst, date),
-                ))
-        time.sleep(0.3)
+        log.info("SkyUp: %d destinații din %s", len(destinations), home)
+        for dest in destinations:
+            # un singur apel întoarce calendarul pe zile pentru ambele direcții
+            body = {
+                "AirlineCode": "U5", "OriginCityCode": home, "DestinationCityCode": dest,
+                "Date": TODAY.isoformat(), "EndDate": LAST_DATE.isoformat(), "needReturnFlights": True,
+                "originAndDestIsAirports": True, "TotalPaxCount": 1, "DayRange": 1,
+                "PaxCountDetails": [{"PaxType": "ADULT", "PaxCount": 1}], "PointOfPurchase": "PL",
+            }
+            try:
+                r = s.post("https://skyup.aero/api/site/calendar?language=en&currency=EUR", json=body, headers=headers)
+                r.raise_for_status()
+                data = r.json()
+            except Exception as e:  # noqa: BLE001
+                log.warning("SkyUp %s-%s: %s", home, dest, e)
+                continue
+            for key, org, dst in (("OnwardBestFareDetails", home, dest), ("ReturnBestFareDetails", dest, home)):
+                for f in data.get(key) or []:
+                    date = f["flight_date"][:10]
+                    if f.get("is_sold_out") or not f.get("display_amount") or not in_range(date):
+                        continue
+                    flights.append(Flight(
+                        airline="SkyUp", origin=org, destination=dst, date=date, home=home,
+                        price_eur=to_eur(float(f["display_amount"]), f.get("currency_code") or "EUR", rates),
+                        link=skyup_link(org, dst, date),
+                    ))
+            time.sleep(0.3)
     log.info("SkyUp: %d prețuri", len(flights))
     return flights
 
 
 # --------------------------------------------------------------------------- Kiwi.com
 
-# Orașe deservite din Chișinău de companiile fără scraper propriu: Turkish, Pegasus, AJet, SunExpress,
-# LOT, Lufthansa, Austrian, airBaltic, Eurowings, Aegean, TAROM, Transavia, flydubai, AZAL, Israir...
+# Orașe deservite de companiile fără scraper propriu: Turkish, Pegasus, SunExpress, LOT, Lufthansa,
+# Austrian, airBaltic, Eurowings, Aegean, TAROM, Transavia, flydubai, AZAL, Israir...
 # Kiwi caută acolo toate companiile, inclusiv combinații (ex. dus cu LOT, întors cu Wizz Air).
 KIWI_DESTINATIONS = os.environ.get("KIWI_DESTINATIONS") or (
     "IST,SAW,AYT,BJV,ADB,WAW,FRA,MUC,VIE,RIX,VNO,GYD,DXB,ATH,OTP,ORY,CGN,STR,TLV,SSH,HRG,ZRH,AMS"
@@ -470,62 +506,98 @@ def search_kiwi(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
     headers = {"origin": "https://www.kiwi.com", "referer": "https://www.kiwi.com/"}
     destinations = [d.strip() for d in KIWI_DESTINATIONS.split(",") if d.strip()]
     flights = []
-    for dest in destinations:
-        variables = {
-            "search": {
-                "itinerary": {
-                    "source": {"ids": [f"Station:airport:{ORIGIN}"]},
-                    "destination": {"ids": [f"Station:airport:{dest}"]},
-                    "outboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
-                                              "end": f"{LAST_OUTBOUND}T23:59:59"},
-                    "inboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
-                                             "end": f"{LAST_DATE}T23:59:59"},
-                    "nightsCount": {"start": TRIP_MIN_DAYS, "end": TRIP_MAX_DAYS},
-                },
-                "passengers": {"adults": 1, "children": 0, "infants": 0, "adultsHoldBags": [0],
-                               "adultsHandBags": [0], "childrenHoldBags": [], "childrenHandBags": []},
-                "cabinClass": {"cabinClass": "ECONOMY", "applyMixedClasses": False},
-            },
-            "filter": {"allowDifferentStationConnection": True, "enableSelfTransfer": True,
-                       "enableThrowAwayTicketing": False, "enableTrueHiddenCity": False,
-                       "transportTypes": ["FLIGHT"], "contentProviders": ["KIWI"], "limit": 10},
-            "options": {"sortBy": "PRICE", "mergePriceDiffRule": "INCREASED", "currency": "eur",
-                        "locale": "en", "market": "md", "partner": "skypicker", "partnerMarket": "md",
-                        "storeSearch": False, "searchStrategy": "REDUCED", "abTestInput": {}},
-        }
-        try:
-            r = s.post("https://api.skypicker.com/umbrella/v2/graphql?featureName=SearchReturnItinerariesQuery",
-                       json={"query": KIWI_QUERY, "variables": variables}, headers=headers, timeout=60)
-            r.raise_for_status()
-            result = (r.json().get("data") or {}).get("returnItineraries") or {}
-            if result.get("error"):
-                raise RuntimeError(result["error"])
-        except Exception as e:  # noqa: BLE001
-            log.warning("Kiwi %s: %s", dest, e)
-            continue
-        for it in result.get("itineraries") or []:
-            out = [x["segment"] for x in it["outbound"]["sectorSegments"]]
-            back = [x["segment"] for x in it["inbound"]["sectorSegments"]]
-            edges = it["bookingOptions"]["edges"]
-            if not out or not back or not edges:
+    for home in ORIGINS:
+        for dest in destinations:
+            if city_of(dest) == city_of(home):
                 continue
-            arrival = out[-1]["destination"]["station"]
-            names.setdefault(arrival["code"], arrival["city"]["name"])
-            carriers = list(dict.fromkeys(seg["carrier"]["name"] for seg in out + back))
-            flights.append(Flight(
-                airline=" + ".join(carriers) + " (Kiwi)", origin=ORIGIN, destination=arrival["code"],
-                date=out[0]["source"]["localTime"][:10],
-                price_eur=to_eur(float(it["price"]["amount"]), "EUR", rates),
-                link="https://www.kiwi.com" + edges[0]["node"]["bookingUrl"],
-                direct=len(out) == 1 and len(back) == 1,
-                return_date=back[0]["source"]["localTime"][:10],
-            ))
-        time.sleep(0.5)
-    log.info("Kiwi: %d oferte dus-întors pentru %d destinații", len(flights), len(destinations))
+            variables = {
+                "search": {
+                    "itinerary": {
+                        "source": {"ids": [f"Station:airport:{home}"]},
+                        "destination": {"ids": [f"Station:airport:{dest}"]},
+                        "outboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
+                                                  "end": f"{LAST_OUTBOUND}T23:59:59"},
+                        "inboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
+                                                 "end": f"{LAST_DATE}T23:59:59"},
+                        "nightsCount": {"start": TRIP_MIN_DAYS, "end": TRIP_MAX_DAYS},
+                    },
+                    "passengers": {"adults": 1, "children": 0, "infants": 0, "adultsHoldBags": [0],
+                                   "adultsHandBags": [0], "childrenHoldBags": [], "childrenHandBags": []},
+                    "cabinClass": {"cabinClass": "ECONOMY", "applyMixedClasses": False},
+                },
+                "filter": {"allowDifferentStationConnection": True, "enableSelfTransfer": True,
+                           "enableThrowAwayTicketing": False, "enableTrueHiddenCity": False,
+                           "transportTypes": ["FLIGHT"], "contentProviders": ["KIWI"], "limit": 10},
+                "options": {"sortBy": "PRICE", "mergePriceDiffRule": "INCREASED", "currency": "eur",
+                            "locale": "en", "market": "md", "partner": "skypicker", "partnerMarket": "md",
+                            "storeSearch": False, "searchStrategy": "REDUCED", "abTestInput": {}},
+            }
+            try:
+                r = s.post("https://api.skypicker.com/umbrella/v2/graphql?featureName=SearchReturnItinerariesQuery",
+                           json={"query": KIWI_QUERY, "variables": variables}, headers=headers, timeout=60)
+                r.raise_for_status()
+                result = (r.json().get("data") or {}).get("returnItineraries") or {}
+                if result.get("error"):
+                    raise RuntimeError(result["error"])
+            except Exception as e:  # noqa: BLE001
+                log.warning("Kiwi %s-%s: %s", home, dest, e)
+                continue
+            for it in result.get("itineraries") or []:
+                out = [x["segment"] for x in it["outbound"]["sectorSegments"]]
+                back = [x["segment"] for x in it["inbound"]["sectorSegments"]]
+                edges = it["bookingOptions"]["edges"]
+                if not out or not back or not edges:
+                    continue
+                arrival = out[-1]["destination"]["station"]
+                names.setdefault(arrival["code"], arrival["city"]["name"])
+                carriers = list(dict.fromkeys(seg["carrier"]["name"] for seg in out + back))
+                flights.append(Flight(
+                    airline=" + ".join(carriers) + " (Kiwi)", origin=home, destination=arrival["code"],
+                    date=out[0]["source"]["localTime"][:10], home=home,
+                    price_eur=to_eur(float(it["price"]["amount"]), "EUR", rates),
+                    link="https://www.kiwi.com" + edges[0]["node"]["bookingUrl"],
+                    direct=len(out) == 1 and len(back) == 1,
+                    return_date=back[0]["source"]["localTime"][:10],
+                ))
+            time.sleep(0.5)
+    log.info("Kiwi: %d oferte dus-întors", len(flights))
     return flights
 
 
-SOURCES = [search_wizzair, search_flyone, search_hisky, search_skyup, search_kiwi, search_aviasales]
+# --------------------------------------------------------------------------- Aviasales (opțional)
+
+def search_aviasales(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
+    """Necesită TRAVELPAYOUTS_TOKEN gratuit. Întoarce oferte dus-întors deja combinate."""
+    if not TRAVELPAYOUTS_TOKEN:
+        log.info("Aviasales: sărit (nu e setat TRAVELPAYOUTS_TOKEN)")
+        return []
+    flights = []
+    for home in ORIGINS:
+        for month in month_starts(TODAY, LAST_OUTBOUND):
+            r = s.get("https://api.travelpayouts.com/aviasales/v3/prices_for_dates", params={
+                "origin": home, "departure_at": month.strftime("%Y-%m"), "one_way": "false", "direct": "false",
+                "sorting": "price", "currency": "eur", "limit": 1000, "token": TRAVELPAYOUTS_TOKEN,
+            })
+            r.raise_for_status()
+            for f in r.json().get("data") or []:
+                date = f["departure_at"][:10]
+                ret = (f.get("return_at") or "")[:10]
+                if not ret or not in_range(date):
+                    continue
+                flights.append(Flight(
+                    airline=f"Aviasales ({f.get('airline', '?')})", origin=home,
+                    destination=f.get("destination_airport") or f["destination"], date=date, home=home,
+                    price_eur=to_eur(float(f["price"]), "EUR", rates),
+                    link="https://www.aviasales.com" + f["link"] if f.get("link") else "https://www.aviasales.com",
+                    direct=f.get("transfers", 0) == 0 and f.get("return_transfers", 0) == 0,
+                    return_date=ret,
+                ))
+            time.sleep(0.4)
+    log.info("Aviasales: %d oferte dus-întors", len(flights))
+    return flights
+
+
+SOURCES = [search_wizzair, search_ryanair, search_flyone, search_hisky, search_skyup, search_kiwi, search_aviasales]
 
 
 # --------------------------------------------------------------------------- combinare dus + întors
@@ -536,37 +608,40 @@ def stay_ok(out_date: str, back_date: str) -> bool:
 
 
 def cheapest_trips(flights: list[Flight], names: dict) -> list[Trip]:
-    """Cea mai ieftină combinație dus + întors pentru fiecare oraș.
+    """Cea mai ieftină combinație dus + întors pentru fiecare (oraș de plecare, oraș destinație).
 
     Dusul și întorsul pot fi cu companii diferite și pe aeroporturi diferite din același oraș."""
-    # cel mai ieftin zbor pe (oraș, direcție, aeroport, zi) - reduce mult numărul de combinații
+    # cel mai ieftin zbor pe (plecare, oraș, direcție, aeroport, zi) - reduce mult numărul de combinații
     cheapest: dict[tuple, Flight] = {}
-    best: dict[str, Trip] = {}
+    best: dict[tuple, Trip] = {}
 
     def consider(trip: Trip) -> None:
         if MAX_PRICE_EUR and trip.total_eur > MAX_PRICE_EUR:
             return
-        if trip.place not in best or trip.total_eur < best[trip.place].total_eur:
-            best[trip.place] = trip
+        key = (trip.home, trip.place)
+        if key not in best or trip.total_eur < best[key].total_eur:
+            best[key] = trip
 
     for f in flights:
+        if f.place == city_of(f.home):  # ex. Otopeni → Băneasa
+            continue
         if f.return_date:  # ofertă dus-întors gata făcută
             if f.date <= LAST_OUTBOUND.isoformat() and stay_ok(f.date, f.return_date):
-                consider(Trip(f.place, city_name(f.place, names), f, None, f.price_eur))
+                consider(Trip(f.home, f.place, city_name(f.place, names), f, None, f.price_eur))
             continue
-        if f.origin == ORIGIN and f.date > LAST_OUTBOUND.isoformat():
+        if f.outbound and f.date > LAST_OUTBOUND.isoformat():
             continue
-        key = (f.place, f.origin == ORIGIN, f.airport, f.date)
+        key = (f.home, f.place, f.outbound, f.airport, f.date)
         if key not in cheapest or f.price_eur < cheapest[key].price_eur:
             cheapest[key] = f
 
-    outbound: dict[str, list[Flight]] = {}
-    inbound: dict[str, list[Flight]] = {}
-    for (place, is_out, _, _), f in cheapest.items():
-        (outbound if is_out else inbound).setdefault(place, []).append(f)
+    outbound: dict[tuple, list[Flight]] = {}
+    inbound: dict[tuple, list[Flight]] = {}
+    for (home, place, is_out, _, _), f in cheapest.items():
+        (outbound if is_out else inbound).setdefault((home, place), []).append(f)
 
-    for place, outs in outbound.items():
-        backs = inbound.get(place, [])
+    for (home, place), outs in outbound.items():
+        backs = inbound.get((home, place), [])
         for out in outs:
             for back in backs:
                 if not stay_ok(out.date, back.date):
@@ -574,10 +649,12 @@ def cheapest_trips(flights: list[Flight], names: dict) -> list[Trip]:
                 link = ""
                 if out.airline == back.airline and out.airport == back.airport:
                     if out.airline == "Wizz Air":
-                        link = wizz_link(ORIGIN, out.airport, out.date, back.date)
+                        link = wizz_link(home, out.airport, out.date, back.date)
                     elif out.airline == "SkyUp":
-                        link = skyup_link(ORIGIN, out.airport, out.date, back.date)
-                consider(Trip(place, city_name(place, names), out, back,
+                        link = skyup_link(home, out.airport, out.date, back.date)
+                    elif out.airline == "Ryanair":
+                        link = ryanair_link(home, out.airport, out.date, back.date)
+                consider(Trip(home, place, city_name(place, names), out, back,
                               round(out.price_eur + back.price_eur, 2), link))
     return sorted(best.values(), key=lambda t: t.total_eur)
 
@@ -598,12 +675,10 @@ def leg_line(arrow: str, f: Flight) -> str:
             f"<a href=\"{html.escape(f.link)}\">bilet</a>")
 
 
-def format_message(top: list[Trip], previous: dict, errors: list[str]) -> list[str]:
-    header = (f"✈️ <b>Bilete ieftine dus-întors din Chișinău</b> — {TODAY:%d.%m.%Y}\n"
-              f"(plecare în următoarele {DAYS_AHEAD} zile, întoarcere după {TRIP_MIN_DAYS}–{TRIP_MAX_DAYS} zile)\n")
+def trip_lines(top: list[Trip], previous: dict) -> list[str]:
     lines = []
     for i, t in enumerate(top, 1):
-        old = previous.get(t.place)
+        old = previous.get(f"{t.home}:{t.place}")
         trend = ""
         if old is None:
             trend = " 🆕"
@@ -623,18 +698,29 @@ def format_message(top: list[Trip], previous: dict, errors: list[str]) -> list[s
                      f"{html.escape(t.out.airline)}{stop}\n"
                      f"   🔗 <a href=\"{html.escape(t.out.link)}\">Rezervă</a>")
         lines.append(line)
-    if not lines:
-        lines.append("Nu am găsit zboruri dus-întors în criteriile setate.")
-    footer = ("\n⚠️ Erori: " + html.escape("; ".join(errors))) if errors else ""
+    return lines
+
+
+def format_messages(trips: list[Trip], previous: dict, errors: list[str]) -> list[str]:
+    """Câte o listă pentru fiecare oraș de plecare; mesajele sunt împărțite la limita Telegram."""
+    blocks = [f"✈️ <b>Bilete ieftine dus-întors</b> — {TODAY:%d.%m.%Y}\n"
+              f"(plecare în următoarele {DAYS_AHEAD} zile, întoarcere după {TRIP_MIN_DAYS}–{TRIP_MAX_DAYS} zile)\n"]
+    for home in ORIGINS:
+        top = [t for t in trips if t.home == home][:TOP_N]
+        blocks.append(f"\n🏠 <b>Din {html.escape(ORIGIN_NAMES.get(home, home))} ({home})</b>\n")
+        lines = trip_lines(top, previous)
+        blocks += ["\n" + line + "\n" for line in lines] or ["\nNu am găsit zboruri în criteriile setate.\n"]
+    if errors:
+        blocks.append("\n⚠️ Erori: " + html.escape("; ".join(errors)))
 
     # Telegram are o limită de 4096 caractere pe mesaj
-    messages, current = [], header
-    for line in lines:
-        if len(current) + len(line) + 2 > 3900:
+    messages, current = [], ""
+    for block in blocks:
+        if current and len(current) + len(block) > 3900:
             messages.append(current)
             current = ""
-        current += "\n" + line + "\n"
-    messages.append(current + footer)
+        current += block
+    messages.append(current)
     return messages
 
 
@@ -678,7 +764,7 @@ def main() -> int:
 
     ranked = cheapest_trips(flights, names)
     previous = load_state()
-    messages = format_message(ranked[:TOP_N], previous, errors)
+    messages = format_messages(ranked, previous, errors)
 
     if args.dry_run:
         for msg in messages:
@@ -687,7 +773,7 @@ def main() -> int:
         for msg in messages:
             send_telegram(s, msg)
         log.info("Trimis pe Telegram (%d mesaje)", len(messages))
-        STATE_FILE.write_text(json.dumps({t.place: t.total_eur for t in ranked}, indent=1))
+        STATE_FILE.write_text(json.dumps({f"{t.home}:{t.place}": t.total_eur for t in ranked}, indent=1))
 
     (BASE_DIR / "last_results.json").write_text(json.dumps([asdict(t) for t in ranked], indent=1, ensure_ascii=False))
     return 0
