@@ -56,7 +56,7 @@ TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 TRAVELPAYOUTS_TOKEN = os.environ.get("TRAVELPAYOUTS_TOKEN", "")
 DAYS_AHEAD = env_int("DAYS_AHEAD", 180)         # plecarea: în următoarele N zile
 TRIP_MIN_DAYS = env_int("TRIP_MIN_DAYS", 2)     # întoarcerea: minim N zile după plecare
-TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 14)    # întoarcerea: maxim N zile după plecare
+TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 7)    # întoarcerea: maxim N zile după plecare
 MAX_PRICE_EUR = float(os.environ.get("MAX_PRICE_EUR") or 0)  # preț total maxim, 0 = fără limită
 TOP_N = env_int("TOP_N", 15)
 

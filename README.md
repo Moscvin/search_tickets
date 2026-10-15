@@ -2,7 +2,7 @@
 
 Caută zilnic cele mai ieftine bilete **dus-întors** din Chișinău (RMO) în orice direcție și trimite pe Telegram
 top destinații cu preț total, datele dus/întors, companie și link de rezervare.
-Plecarea în următoarele 180 de zile, întoarcerea după 2–14 zile (se pot combina companii diferite).
+Plecarea în următoarele 180 de zile, întoarcerea după 2–7 zile (se pot combina companii diferite).
 
 Surse:
 - **Wizz Air**: API-ul site-ului (toate rutele din RMO)

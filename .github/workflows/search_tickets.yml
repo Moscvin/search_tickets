@@ -34,7 +34,7 @@ jobs:
           TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
           DAYS_AHEAD: ${{ vars.DAYS_AHEAD || '180' }}
           TRIP_MIN_DAYS: ${{ vars.TRIP_MIN_DAYS || '2' }}
-          TRIP_MAX_DAYS: ${{ vars.TRIP_MAX_DAYS || '14' }}
+          TRIP_MAX_DAYS: ${{ vars.TRIP_MAX_DAYS || '7' }}
           MAX_PRICE_EUR: ${{ vars.MAX_PRICE_EUR || '0' }}
           TOP_N: ${{ vars.TOP_N || '15' }}
         run: python search_tickets.py
