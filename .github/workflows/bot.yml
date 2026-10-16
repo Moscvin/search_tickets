@@ -1,0 +1,34 @@
+name: Bot Telegram (răspunde la mesaje)
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # verifică mesajele noi la ~5 minute (GitHub poate întârzia rulările)
+  workflow_dispatch:
+
+# o singură sesiune odată: Telegram nu permite două citiri de mesaje în paralel
+concurrency:
+  group: telegram-bot
+  cancel-in-progress: false
+
+jobs:
+  answer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # dacă există mesaje, rămâne activ ~10 minute ca să răspundă instant la butoane
+      - name: Răspunde la mesaje
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
+          DAYS_AHEAD: ${{ vars.DAYS_AHEAD || '180' }}
+        run: python bot.py

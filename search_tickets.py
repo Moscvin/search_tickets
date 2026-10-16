@@ -62,6 +62,14 @@ TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 7)     # întoarcerea: maxim N zile dup
 MAX_PRICE_EUR = float(os.environ.get("MAX_PRICE_EUR") or 0)  # preț total maxim, 0 = fără limită
 TOP_N = env_int("TOP_N", 15)                    # câte destinații pentru fiecare oraș de plecare
 
+# Dacă e setat (de bot.py), sursele caută doar spre aceste aeroporturi
+ROUTE_DESTINATIONS: set[str] | None = None
+
+
+def wanted(airport: str) -> bool:
+    return ROUTE_DESTINATIONS is None or airport in ROUTE_DESTINATIONS
+
+
 TODAY = dt.date.today()
 LAST_OUTBOUND = TODAY + dt.timedelta(days=DAYS_AHEAD)
 LAST_DATE = LAST_OUTBOUND + dt.timedelta(days=TRIP_MAX_DAYS)  # orizontul de căutare pentru întoarceri
@@ -85,7 +93,8 @@ CITY_AIRPORTS = {
     "WAW": ("Varșovia", ["WAW", "WMI"]),
     "BCN": ("Barcelona", ["BCN", "GRO", "REU"]),
     "OSL": ("Oslo", ["OSL", "TRF", "RYG"]),
-    "BUH": ("București", ["OTP", "BBU"]),
+    "BUH": ("București", ["OTP"]),
+    "EAP": ("Basel", ["BSL", "MLH"]),
 }
 AIRPORT_CITY = {airport: city for city, (_, airports) in CITY_AIRPORTS.items() for airport in airports}
 
@@ -94,6 +103,9 @@ AIRPORT_NAMES = {
     "OMR": "Oradea", "CLJ": "Cluj-Napoca", "TSR": "Timișoara", "IAS": "Iași", "RMO": "Chișinău",
     "HAM": "Hamburg", "PMF": "Parma", "GYD": "Baku", "SSH": "Sharm El Sheikh", "BUS": "Batumi",
     "SBZ": "Sibiu", "CND": "Constanța", "SCV": "Suceava", "BCM": "Bacău", "CRA": "Craiova",
+    "AYT": "Antalya", "BJV": "Bodrum", "ADB": "Izmir", "RIX": "Riga", "VNO": "Vilnius", "MUC": "München",
+    "VIE": "Viena", "ZRH": "Zürich", "AMS": "Amsterdam", "HRG": "Hurghada", "ATH": "Atena", "CGN": "Köln",
+    "STR": "Stuttgart", "TLV": "Tel Aviv", "JFK": "New York", "NBE": "Enfidha", "DWC": "Dubai",
 }
 
 
@@ -216,6 +228,7 @@ def search_wizzair(s: requests.Session, rates: dict, names: dict) -> list[Flight
             c["iata"] for c in by_iata[home]["connections"]
             if not by_iata.get(c["iata"], {}).get("isFakeStation")  # sar peste "Londra (toate aeroporturile)" etc.
         ]
+        destinations = [d for d in destinations if wanted(d)]
         log.info("Wizz Air: %d destinații din %s", len(destinations), home)
         consecutive_failures = 0
         for dest in destinations:
@@ -271,7 +284,8 @@ def search_ryanair(s: requests.Session, rates: dict, names: dict) -> list[Flight
         if r.status_code == 404:  # Ryanair nu zboară din acest aeroport (ex. Chișinău)
             continue
         r.raise_for_status()
-        routes = [rt["arrivalAirport"] for rt in r.json() if rt.get("operator") == "FR"]
+        routes = [rt["arrivalAirport"] for rt in r.json()
+                  if rt.get("operator") == "FR" and wanted(rt["arrivalAirport"]["code"])]
         for a in routes:
             names.setdefault(a["code"], a["city"]["name"])
         log.info("Ryanair: %d destinații din %s", len(routes), home)
@@ -345,7 +359,8 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
             r = s.post(f"{api}/search/get-route-fare", json=body, headers=headers)
             r.raise_for_status()
             for f in r.json().get("destinationFares") or []:
-                destinations.setdefault(f["destination"], f.get("connType") == 1)
+                if wanted(f["destination"]):
+                    destinations.setdefault(f["destination"], f.get("connType") == 1)
             time.sleep(0.3)
         if not destinations:
             continue
@@ -406,7 +421,7 @@ def search_hisky(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
     flights = []
     for org, dst, raw in blocks:
         for home in ORIGINS:
-            if home not in (org, dst):
+            if home not in (org, dst) or not wanted(dst if org == home else org):
                 continue
             for f in json.loads(raw):
                 price = float(str(f["price"]).replace(",", ""))
@@ -441,7 +456,7 @@ def search_skyup(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
     for home in ORIGINS:
         destinations = []
         for c in connections:
-            if c["originAirport"]["airportCode"] == home:
+            if c["originAirport"]["airportCode"] == home and wanted(c["destinationAirport"]["airportCode"]):
                 dest = c["destinationAirport"]
                 destinations.append(dest["airportCode"])
                 names.setdefault(dest["airportCode"], dest["cityName"])
@@ -582,7 +597,7 @@ def search_aviasales(s: requests.Session, rates: dict, names: dict) -> list[Flig
             for f in r.json().get("data") or []:
                 date = f["departure_at"][:10]
                 ret = (f.get("return_at") or "")[:10]
-                if not ret or not in_range(date):
+                if not ret or not in_range(date) or not wanted(f.get("destination_airport") or f["destination"]):
                     continue
                 flights.append(Flight(
                     airline=f"Aviasales ({f.get('airline', '?')})", origin=home,
@@ -607,27 +622,24 @@ def stay_ok(out_date: str, back_date: str) -> bool:
     return TRIP_MIN_DAYS <= days <= TRIP_MAX_DAYS
 
 
-def cheapest_trips(flights: list[Flight], names: dict) -> list[Trip]:
-    """Cea mai ieftină combinație dus + întors pentru fiecare (oraș de plecare, oraș destinație).
+def all_trips(flights: list[Flight], names: dict) -> list[Trip]:
+    """Toate combinațiile dus + întors valide, de la cea mai ieftină.
 
     Dusul și întorsul pot fi cu companii diferite și pe aeroporturi diferite din același oraș."""
     # cel mai ieftin zbor pe (plecare, oraș, direcție, aeroport, zi) - reduce mult numărul de combinații
     cheapest: dict[tuple, Flight] = {}
-    best: dict[tuple, Trip] = {}
+    trips: list[Trip] = []
 
-    def consider(trip: Trip) -> None:
-        if MAX_PRICE_EUR and trip.total_eur > MAX_PRICE_EUR:
-            return
-        key = (trip.home, trip.place)
-        if key not in best or trip.total_eur < best[key].total_eur:
-            best[key] = trip
+    def add(trip: Trip) -> None:
+        if not MAX_PRICE_EUR or trip.total_eur <= MAX_PRICE_EUR:
+            trips.append(trip)
 
     for f in flights:
         if f.place == city_of(f.home):  # ex. Otopeni → Băneasa
             continue
         if f.return_date:  # ofertă dus-întors gata făcută
             if f.date <= LAST_OUTBOUND.isoformat() and stay_ok(f.date, f.return_date):
-                consider(Trip(f.home, f.place, city_name(f.place, names), f, None, f.price_eur))
+                add(Trip(f.home, f.place, city_name(f.place, names), f, None, f.price_eur))
             continue
         if f.outbound and f.date > LAST_OUTBOUND.isoformat():
             continue
@@ -654,8 +666,16 @@ def cheapest_trips(flights: list[Flight], names: dict) -> list[Trip]:
                         link = skyup_link(home, out.airport, out.date, back.date)
                     elif out.airline == "Ryanair":
                         link = ryanair_link(home, out.airport, out.date, back.date)
-                consider(Trip(home, place, city_name(place, names), out, back,
-                              round(out.price_eur + back.price_eur, 2), link))
+                add(Trip(home, place, city_name(place, names), out, back,
+                         round(out.price_eur + back.price_eur, 2), link))
+    return sorted(trips, key=lambda t: t.total_eur)
+
+
+def cheapest_trips(flights: list[Flight], names: dict) -> list[Trip]:
+    """Cea mai ieftină combinație dus + întors pentru fiecare (oraș de plecare, oraș destinație)."""
+    best: dict[tuple, Trip] = {}
+    for trip in all_trips(flights, names):
+        best.setdefault((trip.home, trip.place), trip)  # lista e deja sortată după preț
     return sorted(best.values(), key=lambda t: t.total_eur)
 
 
