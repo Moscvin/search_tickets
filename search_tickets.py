@@ -61,6 +61,8 @@ TRIP_MIN_DAYS = env_int("TRIP_MIN_DAYS", 2)     # întoarcerea: minim N zile dup
 TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 7)     # întoarcerea: maxim N zile după plecare
 MAX_PRICE_EUR = float(os.environ.get("MAX_PRICE_EUR") or 0)  # preț total maxim, 0 = fără limită
 TOP_N = env_int("TOP_N", 15)                    # câte destinații pentru fiecare oraș de plecare
+# Doar zboruri directe (fără escală); DIRECT_ONLY=false le include și pe cele cu escală
+DIRECT_ONLY = (os.environ.get("DIRECT_ONLY") or "true").lower() not in ("0", "false", "nu", "no")
 
 # Dacă e setat (de bot.py), sursele caută doar spre aceste aeroporturi
 ROUTE_DESTINATIONS: set[str] | None = None
@@ -353,14 +355,14 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
     flights = []
     for home in ORIGINS:
         # 1) destinațiile care au tarife (cel mai mic preț pe destinație, pe lună)
-        destinations: dict[str, bool] = {}  # destinație -> zbor direct
+        destinations: dict[str, bool] = {}  # destinație -> zbor direct (connType 1 = cu escală, ex. Moscova)
         for month in months:
             body = {"token": token, "origin": home, "travelDate": max(month, TODAY).isoformat(), "currencyCode": "EUR"}
             r = s.post(f"{api}/search/get-route-fare", json=body, headers=headers)
             r.raise_for_status()
             for f in r.json().get("destinationFares") or []:
                 if wanted(f["destination"]):
-                    destinations.setdefault(f["destination"], f.get("connType") == 1)
+                    destinations.setdefault(f["destination"], f.get("connType") != 1)
             time.sleep(0.3)
         if not destinations:
             continue
@@ -542,7 +544,8 @@ def search_kiwi(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
                 },
                 "filter": {"allowDifferentStationConnection": True, "enableSelfTransfer": True,
                            "enableThrowAwayTicketing": False, "enableTrueHiddenCity": False,
-                           "transportTypes": ["FLIGHT"], "contentProviders": ["KIWI"], "limit": 10},
+                           "transportTypes": ["FLIGHT"], "contentProviders": ["KIWI"], "limit": 10,
+                           **({"maxStopsCount": 0} if DIRECT_ONLY else {})},
                 "options": {"sortBy": "PRICE", "mergePriceDiffRule": "INCREASED", "currency": "eur",
                             "locale": "en", "market": "md", "partner": "skypicker", "partnerMarket": "md",
                             "storeSearch": False, "searchStrategy": "REDUCED", "abTestInput": {}},
@@ -622,7 +625,7 @@ def stay_ok(out_date: str, back_date: str) -> bool:
     return TRIP_MIN_DAYS <= days <= TRIP_MAX_DAYS
 
 
-def all_trips(flights: list[Flight], names: dict) -> list[Trip]:
+def all_trips(flights: list[Flight], names: dict, direct_only: bool | None = None) -> list[Trip]:
     """Toate combinațiile dus + întors valide, de la cea mai ieftină.
 
     Dusul și întorsul pot fi cu companii diferite și pe aeroporturi diferite din același oraș."""
@@ -634,8 +637,12 @@ def all_trips(flights: list[Flight], names: dict) -> list[Trip]:
         if not MAX_PRICE_EUR or trip.total_eur <= MAX_PRICE_EUR:
             trips.append(trip)
 
+    if direct_only is None:
+        direct_only = DIRECT_ONLY
     for f in flights:
         if f.place == city_of(f.home):  # ex. Otopeni → Băneasa
+            continue
+        if direct_only and not f.direct:
             continue
         if f.return_date:  # ofertă dus-întors gata făcută
             if f.date <= LAST_OUTBOUND.isoformat() and stay_ok(f.date, f.return_date):
@@ -727,7 +734,8 @@ def trip_lines(top: list[Trip], previous: dict) -> list[str]:
 def format_messages(trips: list[Trip], previous: dict, errors: list[str]) -> list[str]:
     """Câte o listă pentru fiecare oraș de plecare; mesajele sunt împărțite la limita Telegram."""
     blocks = [f"✈️ <b>Bilete ieftine dus-întors</b> — {TODAY:%d.%m.%Y}\n"
-              f"(plecare în următoarele {DAYS_AHEAD} zile, întoarcere după {TRIP_MIN_DAYS}–{TRIP_MAX_DAYS} zile)\n"]
+              f"(plecare în următoarele {DAYS_AHEAD} zile, întoarcere după {TRIP_MIN_DAYS}–{TRIP_MAX_DAYS} zile"
+              f"{', doar zboruri directe' if DIRECT_ONLY else ''})\n"]
     for home in ORIGINS:
         top = [t for t in trips if t.home == home][:TOP_N]
         blocks.append(f"\n🏠 <b>Din {html.escape(ORIGIN_NAMES.get(home, home))} ({home})</b>\n")

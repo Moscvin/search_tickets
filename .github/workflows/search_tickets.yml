@@ -43,6 +43,7 @@ jobs:
           MAX_PRICE_EUR: ${{ vars.MAX_PRICE_EUR || '0' }}
           ORIGINS: ${{ vars.ORIGINS || 'RMO,IAS,OTP' }}
           TOP_N: ${{ vars.TOP_N || '15' }}
+          DIRECT_ONLY: ${{ vars.DIRECT_ONLY || 'true' }}
           KIWI_DESTINATIONS: ${{ vars.KIWI_DESTINATIONS }}
         run: python search_tickets.py
 

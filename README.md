@@ -2,7 +2,7 @@
 
 Caută săptămânal (lunea) cele mai ieftine bilete **dus-întors** din Chișinău (RMO), Iași (IAS) și București (OTP) în orice direcție și trimite pe Telegram
 top destinații cu preț total, datele dus/întors, companie și link de rezervare.
-Plecarea în următoarele 180 de zile, întoarcerea după 2–7 zile.
+Plecarea în următoarele 180 de zile, întoarcerea după 2–7 zile, doar zboruri directe (`DIRECT_ONLY=false` le include și pe cele cu escală).
 
 Surse:
 - **Wizz Air**: API-ul site-ului (toate rutele)
@@ -26,14 +26,15 @@ Dusul și întorsul se pot combina între companii și între aeroporturile acel
 1. Urcă proiectul într-un repo pe GitHub.
 2. **Settings → Secrets and variables → Actions → New repository secret**:
    `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (și opțional `TRAVELPAYOUTS_TOKEN`).
-3. Opțional, la tab-ul **Variables**: `ORIGINS`, `DAYS_AHEAD`, `TRIP_MIN_DAYS`, `TRIP_MAX_DAYS`, `MAX_PRICE_EUR`, `TOP_N`, `KIWI_DESTINATIONS`.
+3. Opțional, la tab-ul **Variables**: `ORIGINS`, `DAYS_AHEAD`, `TRIP_MIN_DAYS`, `TRIP_MAX_DAYS`, `MAX_PRICE_EUR`, `TOP_N`, `DIRECT_ONLY`, `KIWI_DESTINATIONS`.
 4. **Actions → Bilete ieftine din Chișinău, Iași, București → Run workflow** ca să testezi imediat.
 
 Ora rulării se schimbă în [.github/workflows/search_tickets.yml](.github/workflows/search_tickets.yml) (`cron`, în UTC).
 
 ## 3. Întreabă botul o rută
 Scrie-i botului `/start` (sau orice mesaj) și alege din butoane: **de unde** (Chișinău / Iași / București)
-→ **unde** (doar orașele cu zboruri) → **câte zile**. Botul trimite cele mai ieftine date dus-întors.
+→ **unde** (doar orașele cu zboruri directe) → **câte zile**. Botul trimite cele mai ieftine date dus-întors cu zboruri directe;
+dacă pe rută nu există zbor direct, îți scrie asta și îți arată cele mai ieftine variante cu escală.
 Poți scrie și direct, de exemplu `Chișinău - Dubai 7 zile` sau `Iași - Milano 3-5 zile`.
 
 Botul rulează din [.github/workflows/bot.yml](.github/workflows/bot.yml): verifică mesajele la ~5 minute,

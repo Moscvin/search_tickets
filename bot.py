@@ -36,7 +36,7 @@ HELP = (
     "• <code>București Londra 4</code>\n\n"
     f"Caut dus-întors în următoarele {st.DAYS_AHEAD} de zile, la toate companiile "
     "(Wizz Air, Ryanair, FlyOne, HiSky, SkyUp și restul prin Kiwi.com), "
-    "și îți trimit cele mai ieftine date. Fără zile, caut "
+    "și îți trimit cele mai ieftine date, doar cu zboruri directe. Fără zile, caut "
     f"{st.TRIP_MIN_DAYS}–{st.TRIP_MAX_DAYS} zile."
 )
 
@@ -133,8 +133,10 @@ def resolve_city(s, name: str) -> tuple[str, list[str]] | None:
 
 # --------------------------------------------------------------------------- căutarea
 
-def search_route(s, origins: list[str], destinations: list[str], min_days: int, max_days: int) -> tuple[list, list]:
-    """Toate sursele, limitate la o rută. Întoarce (combinații sortate după preț, erori)."""
+def search_route(s, origins: list[str], destinations: list[str], min_days: int, max_days: int) -> tuple[list, list, list]:
+    """Toate sursele, limitate la o rută.
+
+    Întoarce (variante directe, variante cu escală dacă nu există directe, erori), sortate după preț."""
     st.ORIGINS = origins
     st.ROUTE_DESTINATIONS = set(destinations)
     st.KIWI_DESTINATIONS = ",".join(destinations)
@@ -144,34 +146,55 @@ def search_route(s, origins: list[str], destinations: list[str], min_days: int, 
     rates = st.eur_rates(s)
     names: dict[str, str] = dict(st.AIRPORT_NAMES)
     flights, errors = [], []
-    for source in st.SOURCES:
-        try:
-            flights += source(s, rates, names)
-        except Exception as e:  # noqa: BLE001
-            log.exception("Sursa %s a eșuat", source.__name__)
-            errors.append(f"{source.__name__.removeprefix('search_')}: {e}")
-    return st.all_trips(flights, names), errors
+
+    def run(sources) -> None:
+        for source in sources:
+            try:
+                flights.extend(source(s, rates, names))
+            except Exception as e:  # noqa: BLE001
+                log.exception("Sursa %s a eșuat", source.__name__)
+                errors.append(f"{source.__name__.removeprefix('search_')}: {e}")
+
+    st.DIRECT_ONLY = True
+    run(st.SOURCES)
+    direct = st.all_trips(flights, names, direct_only=True)
+    if direct:
+        return direct, [], errors
+    # niciun zbor direct: căutăm și variantele cu escală (prin Kiwi), ca să le arătăm separat
+    st.DIRECT_ONLY = False
+    run([st.search_kiwi])
+    return [], st.all_trips(flights, names, direct_only=False), errors
 
 
-def format_reply(origin_name: str, dest_name: str, min_days: int, max_days: int, trips: list, errors: list) -> str:
+def pick(trips: list, limit: int) -> list:
+    """Cele mai ieftine variante, câte una pe pereche de date (lista e deja sortată după preț)."""
+    seen, shown = set(), []
+    for t in trips:
+        key = (t.out.date, t.back.date if t.back else t.out.return_date)
+        if key not in seen:
+            seen.add(key)
+            shown.append(t)
+            if len(shown) == limit:
+                break
+    return shown
+
+
+def format_reply(origin_name: str, dest_name: str, min_days: int, max_days: int,
+                 direct: list, with_stops: list, errors: list) -> str:
     days = f"{min_days}" if min_days == max_days else f"{min_days}–{max_days}"
-    lines = [f"✈️ <b>{html.escape(origin_name)} → {html.escape(dest_name)}</b>, dus-întors, {days} zile\n"
+    route = f"{html.escape(origin_name)} → {html.escape(dest_name)}"
+    lines = [f"✈️ <b>{route}</b>, dus-întors, {days} zile, doar zboruri directe\n"
              f"(plecare în următoarele {st.DAYS_AHEAD} zile)\n"]
-    seen = set()
-    shown = []
-    for t in trips:  # deja sortate după preț; o singură variantă pe pereche de date
-        back_date = t.back.date if t.back else t.out.return_date
-        if (t.out.date, back_date) in seen:
-            continue
-        seen.add((t.out.date, back_date))
-        shown.append(t)
-        if len(shown) == RESULTS:
-            break
-    if not shown:
-        lines.append("Nu am găsit zboruri dus-întors pe această rută în perioada asta.")
-    for i, line in enumerate(st.trip_lines(shown, {}), 1):
-        # trip_lines numerotează deja; scoatem marcajul 🆕 care nu are sens aici
-        lines.append(line.replace(" 🆕", ""))
+    if direct:
+        lines += [line.replace(" 🆕", "") for line in st.trip_lines(pick(direct, RESULTS), {})]
+    else:
+        lines.append(f"❌ <b>Nu există zboruri directe {route}</b> dus-întors de {days} zile "
+                     f"în următoarele {st.DAYS_AHEAD} zile.")
+        if with_stops:
+            lines.append("Cele mai ieftine variante <b>cu escală</b>:")
+            lines += [line.replace(" 🆕", "") for line in st.trip_lines(pick(with_stops, 3), {})]
+        else:
+            lines.append("Nu am găsit nici variante cu escală.")
     if errors:
         lines.append("⚠️ Unele surse n-au răspuns: " + html.escape("; ".join(errors)))
     return "\n\n".join(lines)
@@ -191,8 +214,7 @@ def answer(s, text: str) -> str:
     if not d:
         return f"Nu am găsit orașul „{html.escape(dest)}”."
     log.info("Caut %s %s → %s %s, %d-%d zile", o[0], o[1], d[0], d[1], min_days, max_days)
-    trips, errors = search_route(s, o[1], d[1], min_days, max_days)
-    return format_reply(o[0], d[0], min_days, max_days, trips, errors)
+    return format_reply(o[0], d[0], min_days, max_days, *search_route(s, o[1], d[1], min_days, max_days))
 
 
 # --------------------------------------------------------------------------- rutele directe (pentru meniu)
@@ -237,9 +259,15 @@ def route_catalog(s) -> dict[str, dict[str, dict]]:
                         headers={"authorization": f"Bearer {token}", "origin": "https://bookings.flyone.eu"}).json()["routes"]
         for rt in routes:
             names.setdefault(rt["depCode"], rt["depAirportName"].strip())
-        for rt in routes:
-            if rt["depCode"] == "RMO" and "RMO" in found:  # FlyOne are tarife publicate doar din Chișinău
-                found["RMO"].update(rt["arrCodes"])
+        if "RMO" not in found:  # FlyOne are tarife publicate doar din Chișinău
+            return
+        headers = {"authorization": f"Bearer {token}", "origin": "https://bookings.flyone.eu"}
+        for month in st.month_starts(st.TODAY, st.LAST_OUTBOUND):
+            fares = s.post("https://api2.flyone.eu/api/search/get-route-fare", headers=headers, json={
+                "token": token, "origin": "RMO", "travelDate": max(month, st.TODAY).isoformat(), "currencyCode": "EUR",
+            }).json().get("destinationFares") or []
+            # connType 1 = cu escală (ex. Moscova prin Erevan): nu apar în meniu
+            found["RMO"].update(f["destination"] for f in fares if f.get("connType") != 1)
 
     def hisky():
         for org, dst in re.findall(r"var prices_([A-Z]{3})([A-Z]{3})\s*=", s.get("https://hisky.aero/").text):
@@ -255,9 +283,10 @@ def route_catalog(s) -> dict[str, dict[str, dict]]:
 
     for label, fn in (("Wizz", wizz), ("Ryanair", ryanair), ("FlyOne", flyone), ("HiSky", hisky), ("SkyUp", skyup)):
         collect(label, fn)
-    # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...)
+    # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...), cu zboruri directe din Chișinău și București
     for o in MENU_ORIGINS:
-        found[o].update(d.strip() for d in st.KIWI_DESTINATIONS.split(",") if d.strip())
+        if o in ("RMO", "OTP"):
+            found[o].update(d.strip() for d in st.KIWI_DESTINATIONS.split(",") if d.strip())
 
     catalog: dict[str, dict[str, dict]] = {}
     for o, airports in found.items():
@@ -330,7 +359,7 @@ def menu_destinations(catalog: dict, origin: str, page: int) -> tuple[str, list]
         nav.append(button("Înainte ▶️", f"p:{origin}:{page + 1}"))
     keyboard.append(nav)
     text = (f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → unde?</b>\n"
-            f"{len(cities)} destinații cu zboruri directe sau prin Kiwi · pagina {page + 1}/{pages}")
+            f"{len(cities)} destinații cu zboruri directe · pagina {page + 1}/{pages}")
     return text, keyboard
 
 
@@ -347,8 +376,8 @@ def search_from_menu(s, catalog: dict, origin: str, place: str, lo: int, hi: int
     if not info:
         return "Nu mai găsesc această rută. Încearcă din nou cu /start."
     airports = sorted(info["airports"] | set(st.CITY_AIRPORTS.get(place, ("", []))[1]))
-    trips, errors = search_route(s, [origin], airports, lo, hi)
-    return format_reply(st.ORIGIN_NAMES.get(origin, origin), info["name"], lo, hi, trips, errors)
+    return format_reply(st.ORIGIN_NAMES.get(origin, origin), info["name"], lo, hi,
+                        *search_route(s, [origin], airports, lo, hi))
 
 
 class Session:
