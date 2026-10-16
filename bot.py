@@ -372,46 +372,47 @@ DAY_OPTIONS = [("2", 2, 2), ("3", 3, 3), ("4", 4, 4), ("5", 5, 5), ("6", 6, 6), 
                ("10", 10, 10), ("14", 14, 14), ("2–4", 2, 4), ("2–7", 2, 7), ("5–10", 5, 10)]
 
 
-def menu_origins() -> tuple[str, list]:
-    keyboard = [[button(st.ORIGIN_NAMES.get(o, o), f"o:{o}") for o in MENU_ORIGINS]]
-    return "✈️ <b>De unde zbori?</b>", keyboard
+def menu_period() -> tuple[str, list]:
+    """Primul pas: în ce perioadă să caute plecarea."""
+    row = [button(label, f"P:{days}") for label, days in PERIOD_OPTIONS]
+    keyboard = [row[i:i + 3] for i in range(0, len(row), 3)]
+    return ("📅 <b>În ce perioadă vrei să pleci?</b>\n"
+            "Alege din butoane sau scrie numărul de zile (ex. <code>45</code>)."), keyboard
 
 
-def menu_destinations(catalog: dict, origin: str, page: int) -> tuple[str, list]:
+def menu_origins(horizon: int) -> tuple[str, list]:
+    keyboard = [[button(st.ORIGIN_NAMES.get(o, o), f"o:{o}:{horizon}") for o in MENU_ORIGINS],
+                [button("◀️ Altă perioadă", "start")]]
+    return f"📅 Plecare în {period_label(horizon)}\n✈️ <b>De unde zbori?</b>", keyboard
+
+
+def menu_destinations(catalog: dict, origin: str, page: int, horizon: int) -> tuple[str, list]:
     cities = list(catalog.get(origin, {}).items())
     pages = max(1, -(-len(cities) // CITIES_PER_PAGE))
     page = min(max(page, 0), pages - 1)
     chunk = cities[page * CITIES_PER_PAGE:(page + 1) * CITIES_PER_PAGE]
-    keyboard = [[button(info["name"][:20], f"c:{origin}:{place}") for place, info in chunk[i:i + 3]]
+    keyboard = [[button(info["name"][:20], f"c:{origin}:{place}:{horizon}") for place, info in chunk[i:i + 3]]
                 for i in range(0, len(chunk), 3)]
     nav = []
     if page > 0:
-        nav.append(button("◀️ Înapoi", f"p:{origin}:{page - 1}"))
-    nav.append(button("🏠 Alt oraș", "start"))
+        nav.append(button("◀️ Înapoi", f"p:{origin}:{page - 1}:{horizon}"))
+    nav.append(button("🏠 Alt oraș", f"P:{horizon}"))
     if page < pages - 1:
-        nav.append(button("Înainte ▶️", f"p:{origin}:{page + 1}"))
+        nav.append(button("Înainte ▶️", f"p:{origin}:{page + 1}:{horizon}"))
     keyboard.append(nav)
-    text = (f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → unde?</b>\n"
+    text = (f"📅 Plecare în {period_label(horizon)}\n"
+            f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → unde?</b>\n"
             f"{len(cities)} destinații cu zboruri directe · pagina {page + 1}/{pages}")
     return text, keyboard
 
 
-def menu_days(catalog: dict, origin: str, place: str) -> tuple[str, list]:
+def menu_days(catalog: dict, origin: str, place: str, horizon: int) -> tuple[str, list]:
     name = catalog.get(origin, {}).get(place, {}).get("name", place)
-    row = [button(label, f"h:{origin}:{place}:{lo}:{hi}") for label, lo, hi in DAY_OPTIONS]
+    row = [button(label, f"s:{origin}:{place}:{lo}:{hi}:{horizon}") for label, lo, hi in DAY_OPTIONS]
     keyboard = [row[i:i + 4] for i in range(0, len(row), 4)]
-    keyboard.append([button("◀️ Alt oraș destinație", f"o:{origin}")])
-    return f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>\nCâte zile stai?", keyboard
-
-
-def menu_period(catalog: dict, origin: str, place: str, lo: int, hi: int) -> tuple[str, list]:
-    name = catalog.get(origin, {}).get(place, {}).get("name", place)
-    row = [button(label, f"s:{origin}:{place}:{lo}:{hi}:{days}") for label, days in PERIOD_OPTIONS]
-    keyboard = [row[i:i + 3] for i in range(0, len(row), 3)]
-    keyboard.append([button("◀️ Alte zile", f"c:{origin}:{place}")])
-    stay = f"{lo}" if lo == hi else f"{lo}–{hi}"
-    return (f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>, {stay} zile\n"
-            "În ce perioadă să caut plecarea?"), keyboard
+    keyboard.append([button("◀️ Alt oraș destinație", f"o:{origin}:{horizon}")])
+    return (f"📅 Plecare în {period_label(horizon)}\n"
+            f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>\nCâte zile stai?"), keyboard
 
 
 def search_from_menu(s, catalog: dict, origin: str, place: str, lo: int, hi: int, horizon: int) -> str:
@@ -461,28 +462,37 @@ class Session:
            parse_mode="HTML", **extra)
 
     def on_message(self, text: str) -> None:
-        if parse_query(text):
+        if re.fullmatch(r"\s*\d{1,3}\s*(zile|z)?\s*", text, re.I):  # perioada scrisă de mână: „45”
+            horizon = int(re.search(r"\d+", text).group())
+            if 7 <= horizon <= 365:
+                send(self.s, *menu_origins(horizon))
+            else:
+                send(self.s, "Perioada trebuie să fie între 7 și 365 de zile.\n\n" + menu_period()[0], menu_period()[1])
+        elif parse_query(text):
             tg(self.s, "sendMessage", chat_id=st.TELEGRAM_CHAT_ID, text="🔎 Caut, durează 1–2 minute...")
             send(self.s, answer(self.s, text))
         else:  # /start, salut sau orice altceva: meniul cu butoane
-            send(self.s, *menu_origins())
+            send(self.s, *menu_period())
 
     def on_callback(self, cb: dict) -> None:
         data, msg = cb.get("data", ""), cb["message"]
         tg(self.s, "answerCallbackQuery", callback_query_id=cb["id"])
         parts = data.split(":")
+        # butoanele din mesajele vechi (fără perioadă) folosesc perioada implicită
+        horizon = int(parts[-1]) if parts[0] in ("P", "o", "p", "c") and parts[-1].isdigit() and (
+            parts[0] == "P" or len(parts) >= (4 if parts[0] in ("p", "c") else 3)) else st.DAYS_AHEAD
         if data == "start":
-            self.edit(msg, *menu_origins())
+            self.edit(msg, *menu_period())
+        elif parts[0] == "P":
+            self.edit(msg, *menu_origins(horizon))
         elif parts[0] == "o":
             if self._catalog is None and not CATALOG_FILE.exists():
                 self.edit(msg, "⏳ Verific ce zboruri directe există... (~1 minut, doar prima dată azi)")
-            self.edit(msg, *menu_destinations(self.catalog, parts[1], 0))
+            self.edit(msg, *menu_destinations(self.catalog, parts[1], 0, horizon))
         elif parts[0] == "p":
-            self.edit(msg, *menu_destinations(self.catalog, parts[1], int(parts[2])))
+            self.edit(msg, *menu_destinations(self.catalog, parts[1], int(parts[2]), horizon))
         elif parts[0] == "c":
-            self.edit(msg, *menu_days(self.catalog, parts[1], parts[2]))
-        elif parts[0] == "h":
-            self.edit(msg, *menu_period(self.catalog, parts[1], parts[2], int(parts[3]), int(parts[4])))
+            self.edit(msg, *menu_days(self.catalog, parts[1], parts[2], horizon))
         elif parts[0] == "s":
             origin, place, lo, hi = parts[1], parts[2], int(parts[3]), int(parts[4])
             horizon = int(parts[5]) if len(parts) > 5 else st.DAYS_AHEAD
