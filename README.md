@@ -1,6 +1,6 @@
 # Bilete ieftine din Chișinău, Iași și București → Telegram
 
-Caută săptămânal (lunea) cele mai ieftine bilete **dus-întors** din Chișinău (RMO), Iași (IAS) și București (OTP) în orice direcție și trimite pe Telegram
+Caută săptămânal (lunea, pornit de Worker-ul Cloudflare) cele mai ieftine bilete **dus-întors** din Chișinău (RMO), Iași (IAS) și București (OTP) în orice direcție și trimite pe Telegram
 top destinații cu preț total, datele dus/întors, companie și link de rezervare.
 Plecarea în următoarele 180 de zile, întoarcerea după 2–7 zile, doar zboruri directe (`DIRECT_ONLY=false` le include și pe cele cu escală).
 
@@ -41,8 +41,22 @@ dacă pe rută nu există zbor direct, îți scrie asta și îți arată cele ma
 Poți scrie și direct, de exemplu `Chișinău - Dubai 7 zile`, `Iași - Milano 3-5 zile 2 luni` sau
 `Chișinău - Roma 5 zile peste 6-12 luni`, `Chișinău - oriunde weekend 2 persoane`.
 
-Botul rulează din [.github/workflows/bot.yml](.github/workflows/bot.yml): verifică mesajele la ~5 minute,
-deci primul răspuns poate veni după câteva minute; apoi rămâne activ ~10 minute și răspunde instant la butoane.
+### Cum funcționează (gratuit, 24/7, fără calculator pornit)
+- **Cloudflare Worker** ([cloudflare/src/worker.js](cloudflare/src/worker.js)): Telegram îi trimite fiecare mesaj și click;
+  meniul răspunde instant. Planul Free (100.000 de cereri/zi) e de ajuns.
+- **GitHub Actions** ([search_request.yml](.github/workflows/search_request.yml)): Worker-ul pornește căutarea când alegi ruta;
+  rezultatul vine pe Telegram în 1–2 minute (3–10 pentru „Oriunde”).
+- **Programările** Worker-ului pornesc căutarea de luni ([search_tickets.yml](.github/workflows/search_tickets.yml))
+  și actualizarea zilnică a destinațiilor din meniu ([routes.yml](.github/workflows/routes.yml) → `routes.json`).
+
+### Instalarea Worker-ului
+1. Cont gratuit pe [cloudflare.com](https://dash.cloudflare.com/sign-up), apoi în `cloudflare/`: `npx wrangler login`.
+2. Un token GitHub *fine-grained* doar pentru acest repo, cu permisiunea **Actions: Read and write**
+   ([creează-l aici](https://github.com/settings/personal-access-tokens/new)).
+3. În `cloudflare/`: `npx wrangler deploy`, apoi `npx wrangler secret put` pentru `TELEGRAM_BOT_TOKEN`,
+   `TELEGRAM_CHAT_ID`, `GITHUB_TOKEN` și `WEBHOOK_SECRET` (un șir aleator).
+4. Webhook-ul Telegram: `https://api.telegram.org/bot<TOKEN>/setWebhook?url=<adresa Worker-ului>&secret_token=<WEBHOOK_SECRET>`.
+
 Răspunde doar la chat-ul din `TELEGRAM_CHAT_ID`.
 
 ## Rulare locală

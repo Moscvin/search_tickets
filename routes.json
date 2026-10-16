@@ -1,0 +1,1244 @@
+{
+ "date": "2026-10-16",
+ "catalog": {
+  "RMO": {
+   "ALC": {
+    "name": "Alicante",
+    "airports": [
+     "ALC"
+    ]
+   },
+   "ALA": {
+    "name": "Almaty",
+    "airports": [
+     "ALA"
+    ]
+   },
+   "AMS": {
+    "name": "Amsterdam",
+    "airports": [
+     "AMS"
+    ]
+   },
+   "AYT": {
+    "name": "Antalya",
+    "airports": [
+     "AYT"
+    ]
+   },
+   "ATH": {
+    "name": "Atena",
+    "airports": [
+     "ATH"
+    ]
+   },
+   "GYD": {
+    "name": "Baku",
+    "airports": [
+     "GYD"
+    ]
+   },
+   "BCN": {
+    "name": "Barcelona",
+    "airports": [
+     "BCN"
+    ]
+   },
+   "EAP": {
+    "name": "Basel",
+    "airports": [
+     "MLH"
+    ]
+   },
+   "BUS": {
+    "name": "Batumi",
+    "airports": [
+     "BUS"
+    ]
+   },
+   "BER": {
+    "name": "Berlin Brandenburg",
+    "airports": [
+     "BER"
+    ]
+   },
+   "BLQ": {
+    "name": "Bologna",
+    "airports": [
+     "BLQ"
+    ]
+   },
+   "GHV": {
+    "name": "Brasov",
+    "airports": [
+     "GHV"
+    ]
+   },
+   "BTS": {
+    "name": "Bratislava",
+    "airports": [
+     "BTS"
+    ]
+   },
+   "BRU": {
+    "name": "Bruxelles",
+    "airports": [
+     "CRL"
+    ]
+   },
+   "BUH": {
+    "name": "București",
+    "airports": [
+     "OTP"
+    ]
+   },
+   "BUD": {
+    "name": "Budapest",
+    "airports": [
+     "BUD"
+    ]
+   },
+   "CPH": {
+    "name": "Copenhagen",
+    "airports": [
+     "CPH"
+    ]
+   },
+   "CFU": {
+    "name": "Corfu",
+    "airports": [
+     "CFU"
+    ]
+   },
+   "DTM": {
+    "name": "Dortmund",
+    "airports": [
+     "DTM"
+    ]
+   },
+   "DRS": {
+    "name": "Dresden",
+    "airports": [
+     "DRS"
+    ]
+   },
+   "DXB": {
+    "name": "Dubai",
+    "airports": [
+     "DXB"
+    ]
+   },
+   "DUB": {
+    "name": "Dublin",
+    "airports": [
+     "DUB"
+    ]
+   },
+   "DUS": {
+    "name": "Dusseldorf",
+    "airports": [
+     "DUS"
+    ]
+   },
+   "FRA": {
+    "name": "Frankfurt",
+    "airports": [
+     "FRA",
+     "HHN"
+    ]
+   },
+   "GVA": {
+    "name": "Geneva",
+    "airports": [
+     "GVA"
+    ]
+   },
+   "HAM": {
+    "name": "Hamburg",
+    "airports": [
+     "HAM"
+    ]
+   },
+   "HER": {
+    "name": "Heraklion (Crete)",
+    "airports": [
+     "HER"
+    ]
+   },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
+    ]
+   },
+   "IST": {
+    "name": "Istanbul",
+    "airports": [
+     "IST",
+     "SAW"
+    ]
+   },
+   "CGN": {
+    "name": "Köln",
+    "airports": [
+     "CGN"
+    ]
+   },
+   "LCA": {
+    "name": "Larnaca",
+    "airports": [
+     "LCA"
+    ]
+   },
+   "LIS": {
+    "name": "Lisbon",
+    "airports": [
+     "LIS"
+    ]
+   },
+   "LON": {
+    "name": "Londra",
+    "airports": [
+     "LGW",
+     "LTN",
+     "STN"
+    ]
+   },
+   "MAD": {
+    "name": "Madrid",
+    "airports": [
+     "MAD"
+    ]
+   },
+   "AGP": {
+    "name": "Malaga",
+    "airports": [
+     "AGP"
+    ]
+   },
+   "FMM": {
+    "name": "Memmingen / Munich West",
+    "airports": [
+     "FMM"
+    ]
+   },
+   "MIL": {
+    "name": "Milano",
+    "airports": [
+     "BGY",
+     "MXP"
+    ]
+   },
+   "NAP": {
+    "name": "Naples",
+    "airports": [
+     "NAP"
+    ]
+   },
+   "NCE": {
+    "name": "Nice",
+    "airports": [
+     "NCE"
+    ]
+   },
+   "NUE": {
+    "name": "Nuremberg",
+    "airports": [
+     "NUE"
+    ]
+   },
+   "PMI": {
+    "name": "Palma de Mallorca",
+    "airports": [
+     "PMI"
+    ]
+   },
+   "PAR": {
+    "name": "Paris",
+    "airports": [
+     "BVA",
+     "CDG"
+    ]
+   },
+   "PMF": {
+    "name": "Parma",
+    "airports": [
+     "PMF"
+    ]
+   },
+   "PRG": {
+    "name": "Prague",
+    "airports": [
+     "PRG"
+    ]
+   },
+   "PUY": {
+    "name": "Pula",
+    "airports": [
+     "PUY"
+    ]
+   },
+   "RHO": {
+    "name": "Rhodes",
+    "airports": [
+     "RHO"
+    ]
+   },
+   "RIX": {
+    "name": "Riga",
+    "airports": [
+     "RIX"
+    ]
+   },
+   "RMI": {
+    "name": "Rimini",
+    "airports": [
+     "RMI"
+    ]
+   },
+   "ROM": {
+    "name": "Roma",
+    "airports": [
+     "FCO"
+    ]
+   },
+   "SSH": {
+    "name": "Sharm El Sheikh",
+    "airports": [
+     "SSH"
+    ]
+   },
+   "SOF": {
+    "name": "Sofia",
+    "airports": [
+     "SOF"
+    ]
+   },
+   "SPU": {
+    "name": "Split",
+    "airports": [
+     "SPU"
+    ]
+   },
+   "STR": {
+    "name": "Stuttgart",
+    "airports": [
+     "STR"
+    ]
+   },
+   "TAS": {
+    "name": "Tashkent",
+    "airports": [
+     "TAS"
+    ]
+   },
+   "TBS": {
+    "name": "Tbilisi",
+    "airports": [
+     "TBS"
+    ]
+   },
+   "TLV": {
+    "name": "Tel Aviv",
+    "airports": [
+     "TLV"
+    ]
+   },
+   "SKG": {
+    "name": "Thessaloniki",
+    "airports": [
+     "SKG"
+    ]
+   },
+   "TIA": {
+    "name": "Tirana",
+    "airports": [
+     "TIA"
+    ]
+   },
+   "TIV": {
+    "name": "Tivat",
+    "airports": [
+     "TIV"
+    ]
+   },
+   "TRN": {
+    "name": "Turin",
+    "airports": [
+     "TRN"
+    ]
+   },
+   "VLC": {
+    "name": "Valencia",
+    "airports": [
+     "VLC"
+    ]
+   },
+   "WAW": {
+    "name": "Varșovia",
+    "airports": [
+     "WAW",
+     "WMI"
+    ]
+   },
+   "VCE": {
+    "name": "Veneția",
+    "airports": [
+     "VCE"
+    ]
+   },
+   "VRN": {
+    "name": "Verona",
+    "airports": [
+     "VRN"
+    ]
+   },
+   "VIE": {
+    "name": "Viena",
+    "airports": [
+     "VIE"
+    ]
+   },
+   "WRO": {
+    "name": "Wroclaw",
+    "airports": [
+     "WRO"
+    ]
+   },
+   "ZTH": {
+    "name": "Zakynthos",
+    "airports": [
+     "ZTH"
+    ]
+   }
+  },
+  "IAS": {
+   "BCN": {
+    "name": "Barcelona",
+    "airports": [
+     "BCN"
+    ]
+   },
+   "EAP": {
+    "name": "Basel",
+    "airports": [
+     "BSL",
+     "MLH"
+    ]
+   },
+   "BLL": {
+    "name": "Billund",
+    "airports": [
+     "BLL"
+    ]
+   },
+   "BLQ": {
+    "name": "Bologna",
+    "airports": [
+     "BLQ"
+    ]
+   },
+   "BRU": {
+    "name": "Bruxelles",
+    "airports": [
+     "CRL"
+    ]
+   },
+   "BUH": {
+    "name": "București",
+    "airports": [
+     "OTP"
+    ]
+   },
+   "DTM": {
+    "name": "Dortmund",
+    "airports": [
+     "DTM"
+    ]
+   },
+   "DXB": {
+    "name": "Dubai",
+    "airports": [
+     "DXB"
+    ]
+   },
+   "DUB": {
+    "name": "Dublin",
+    "airports": [
+     "DUB"
+    ]
+   },
+   "EIN": {
+    "name": "Eindhoven",
+    "airports": [
+     "EIN"
+    ]
+   },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
+    ]
+   },
+   "IST": {
+    "name": "Istanbul",
+    "airports": [
+     "IST"
+    ]
+   },
+   "LCA": {
+    "name": "Larnaca",
+    "airports": [
+     "LCA"
+    ]
+   },
+   "LPL": {
+    "name": "Liverpool",
+    "airports": [
+     "LPL"
+    ]
+   },
+   "LON": {
+    "name": "Londra",
+    "airports": [
+     "LTN"
+    ]
+   },
+   "MAD": {
+    "name": "Madrid",
+    "airports": [
+     "MAD"
+    ]
+   },
+   "FMM": {
+    "name": "Memmingen / Munich West",
+    "airports": [
+     "FMM"
+    ]
+   },
+   "MIL": {
+    "name": "Milano",
+    "airports": [
+     "BGY",
+     "MXP"
+    ]
+   },
+   "PAR": {
+    "name": "Paris",
+    "airports": [
+     "BVA"
+    ]
+   },
+   "PSA": {
+    "name": "Pisa (Tuscany)",
+    "airports": [
+     "PSA"
+    ]
+   },
+   "PRG": {
+    "name": "Prague",
+    "airports": [
+     "PRG"
+    ]
+   },
+   "ROM": {
+    "name": "Roma",
+    "airports": [
+     "CIA",
+     "FCO"
+    ]
+   },
+   "TLV": {
+    "name": "Tel Aviv",
+    "airports": [
+     "TLV"
+    ]
+   },
+   "TRN": {
+    "name": "Turin",
+    "airports": [
+     "TRN"
+    ]
+   },
+   "VLC": {
+    "name": "Valencia",
+    "airports": [
+     "VLC"
+    ]
+   },
+   "VCE": {
+    "name": "Veneția",
+    "airports": [
+     "TSF",
+     "VCE"
+    ]
+   },
+   "VIE": {
+    "name": "Viena",
+    "airports": [
+     "VIE"
+    ]
+   }
+  },
+  "OTP": {
+   "AUH": {
+    "name": "Abu Dhabi",
+    "airports": [
+     "AUH"
+    ]
+   },
+   "AHO": {
+    "name": "Alghero (Sardinia)",
+    "airports": [
+     "AHO"
+    ]
+   },
+   "ALC": {
+    "name": "Alicante",
+    "airports": [
+     "ALC"
+    ]
+   },
+   "LEI": {
+    "name": "Almería",
+    "airports": [
+     "LEI"
+    ]
+   },
+   "AMM": {
+    "name": "Amman",
+    "airports": [
+     "AMM"
+    ]
+   },
+   "AMS": {
+    "name": "Amsterdam",
+    "airports": [
+     "AMS"
+    ]
+   },
+   "AYT": {
+    "name": "Antalya",
+    "airports": [
+     "AYT"
+    ]
+   },
+   "ARW": {
+    "name": "Arad",
+    "airports": [
+     "ARW"
+    ]
+   },
+   "ATH": {
+    "name": "Atena",
+    "airports": [
+     "ATH"
+    ]
+   },
+   "BCN": {
+    "name": "Barcelona",
+    "airports": [
+     "BCN"
+    ]
+   },
+   "BRI": {
+    "name": "Bari",
+    "airports": [
+     "BRI"
+    ]
+   },
+   "EAP": {
+    "name": "Basel",
+    "airports": [
+     "BSL"
+    ]
+   },
+   "BER": {
+    "name": "Berlin Brandenburg",
+    "airports": [
+     "BER"
+    ]
+   },
+   "BLL": {
+    "name": "Billund",
+    "airports": [
+     "BLL"
+    ]
+   },
+   "BHX": {
+    "name": "Birmingham",
+    "airports": [
+     "BHX"
+    ]
+   },
+   "BLQ": {
+    "name": "Bologna",
+    "airports": [
+     "BLQ"
+    ]
+   },
+   "BOD": {
+    "name": "Bordeaux",
+    "airports": [
+     "BOD"
+    ]
+   },
+   "BTS": {
+    "name": "Bratislava",
+    "airports": [
+     "BTS"
+    ]
+   },
+   "BDS": {
+    "name": "Brindisi",
+    "airports": [
+     "BDS"
+    ]
+   },
+   "BRS": {
+    "name": "Bristol",
+    "airports": [
+     "BRS"
+    ]
+   },
+   "BRU": {
+    "name": "Bruxelles",
+    "airports": [
+     "BRU",
+     "CRL"
+    ]
+   },
+   "BUD": {
+    "name": "Budapest",
+    "airports": [
+     "BUD"
+    ]
+   },
+   "CDT": {
+    "name": "Castellon (Valencia)",
+    "airports": [
+     "CDT"
+    ]
+   },
+   "CTA": {
+    "name": "Catania (Sicily)",
+    "airports": [
+     "CTA"
+    ]
+   },
+   "CHQ": {
+    "name": "Chania (Crete)",
+    "airports": [
+     "CHQ"
+    ]
+   },
+   "RMO": {
+    "name": "Chișinău",
+    "airports": [
+     "RMO"
+    ]
+   },
+   "CLJ": {
+    "name": "Cluj-Napoca",
+    "airports": [
+     "CLJ"
+    ]
+   },
+   "CPH": {
+    "name": "Copenhagen",
+    "airports": [
+     "CPH"
+    ]
+   },
+   "CFU": {
+    "name": "Corfu",
+    "airports": [
+     "CFU"
+    ]
+   },
+   "DTM": {
+    "name": "Dortmund",
+    "airports": [
+     "DTM"
+    ]
+   },
+   "DXB": {
+    "name": "Dubai",
+    "airports": [
+     "DXB"
+    ]
+   },
+   "DUB": {
+    "name": "Dublin",
+    "airports": [
+     "DUB"
+    ]
+   },
+   "DBV": {
+    "name": "Dubrovnik",
+    "airports": [
+     "DBV"
+    ]
+   },
+   "EDI": {
+    "name": "Edinburgh",
+    "airports": [
+     "EDI"
+    ]
+   },
+   "EIN": {
+    "name": "Eindhoven",
+    "airports": [
+     "EIN"
+    ]
+   },
+   "FAO": {
+    "name": "Faro (Algarve)",
+    "airports": [
+     "FAO"
+    ]
+   },
+   "FRA": {
+    "name": "Frankfurt",
+    "airports": [
+     "FRA",
+     "HHN"
+    ]
+   },
+   "GDN": {
+    "name": "Gdansk",
+    "airports": [
+     "GDN"
+    ]
+   },
+   "GOA": {
+    "name": "Genoa",
+    "airports": [
+     "GOA"
+    ]
+   },
+   "LPA": {
+    "name": "Gran Canaria (Canary Islands)",
+    "airports": [
+     "LPA"
+    ]
+   },
+   "HAM": {
+    "name": "Hamburg",
+    "airports": [
+     "HAM"
+    ]
+   },
+   "HER": {
+    "name": "Heraklion (Crete)",
+    "airports": [
+     "HER"
+    ]
+   },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
+    ]
+   },
+   "IST": {
+    "name": "Istanbul",
+    "airports": [
+     "IST",
+     "SAW"
+    ]
+   },
+   "ADB": {
+    "name": "Izmir",
+    "airports": [
+     "ADB"
+    ]
+   },
+   "FKB": {
+    "name": "Karlsruhe/Baden-Baden",
+    "airports": [
+     "FKB"
+    ]
+   },
+   "EFL": {
+    "name": "Kefalonia",
+    "airports": [
+     "EFL"
+    ]
+   },
+   "CGN": {
+    "name": "Köln",
+    "airports": [
+     "CGN"
+    ]
+   },
+   "KRK": {
+    "name": "Kraków",
+    "airports": [
+     "KRK"
+    ]
+   },
+   "SUF": {
+    "name": "Lamezia Terme",
+    "airports": [
+     "SUF"
+    ]
+   },
+   "LCA": {
+    "name": "Larnaca",
+    "airports": [
+     "LCA"
+    ]
+   },
+   "LBA": {
+    "name": "Leeds",
+    "airports": [
+     "LBA"
+    ]
+   },
+   "LIS": {
+    "name": "Lisbon",
+    "airports": [
+     "LIS"
+    ]
+   },
+   "LPL": {
+    "name": "Liverpool",
+    "airports": [
+     "LPL"
+    ]
+   },
+   "LON": {
+    "name": "Londra",
+    "airports": [
+     "LTN",
+     "STN"
+    ]
+   },
+   "LYS": {
+    "name": "Lyon",
+    "airports": [
+     "LYS"
+    ]
+   },
+   "MAD": {
+    "name": "Madrid",
+    "airports": [
+     "MAD"
+    ]
+   },
+   "AGP": {
+    "name": "Malaga",
+    "airports": [
+     "AGP"
+    ]
+   },
+   "MLA": {
+    "name": "Malta",
+    "airports": [
+     "MLA"
+    ]
+   },
+   "MAN": {
+    "name": "Manchester",
+    "airports": [
+     "MAN"
+    ]
+   },
+   "RAK": {
+    "name": "Marrakesh",
+    "airports": [
+     "RAK"
+    ]
+   },
+   "MRS": {
+    "name": "Marseille",
+    "airports": [
+     "MRS"
+    ]
+   },
+   "FMM": {
+    "name": "Memmingen / Munich West",
+    "airports": [
+     "FMM"
+    ]
+   },
+   "MIL": {
+    "name": "Milano",
+    "airports": [
+     "BGY",
+     "MXP"
+    ]
+   },
+   "MUC": {
+    "name": "München",
+    "airports": [
+     "MUC"
+    ]
+   },
+   "JMK": {
+    "name": "Mykonos",
+    "airports": [
+     "JMK"
+    ]
+   },
+   "NAP": {
+    "name": "Naples",
+    "airports": [
+     "NAP"
+    ]
+   },
+   "JFK": {
+    "name": "New York",
+    "airports": [
+     "JFK"
+    ]
+   },
+   "NCE": {
+    "name": "Nice",
+    "airports": [
+     "NCE"
+    ]
+   },
+   "NUE": {
+    "name": "Nuremberg",
+    "airports": [
+     "NUE"
+    ]
+   },
+   "OMR": {
+    "name": "Oradea",
+    "airports": [
+     "OMR"
+    ]
+   },
+   "OSL": {
+    "name": "Oslo",
+    "airports": [
+     "TRF"
+    ]
+   },
+   "PMO": {
+    "name": "Palermo (Sicily)",
+    "airports": [
+     "PMO"
+    ]
+   },
+   "PMI": {
+    "name": "Palma de Mallorca",
+    "airports": [
+     "PMI"
+    ]
+   },
+   "PFO": {
+    "name": "Paphos",
+    "airports": [
+     "PFO"
+    ]
+   },
+   "PAR": {
+    "name": "Paris",
+    "airports": [
+     "BVA",
+     "CDG",
+     "ORY"
+    ]
+   },
+   "PEG": {
+    "name": "Perugia",
+    "airports": [
+     "PEG"
+    ]
+   },
+   "PSR": {
+    "name": "Pescara",
+    "airports": [
+     "PSR"
+    ]
+   },
+   "PSA": {
+    "name": "Pisa (Tuscany)",
+    "airports": [
+     "PSA"
+    ]
+   },
+   "OPO": {
+    "name": "Porto",
+    "airports": [
+     "OPO"
+    ]
+   },
+   "PRG": {
+    "name": "Prague",
+    "airports": [
+     "PRG"
+    ]
+   },
+   "RIX": {
+    "name": "Riga",
+    "airports": [
+     "RIX"
+    ]
+   },
+   "ROM": {
+    "name": "Roma",
+    "airports": [
+     "CIA",
+     "FCO"
+    ]
+   },
+   "SDR": {
+    "name": "Santander",
+    "airports": [
+     "SDR"
+    ]
+   },
+   "JTR": {
+    "name": "Santorini",
+    "airports": [
+     "JTR"
+    ]
+   },
+   "SJJ": {
+    "name": "Sarajevo",
+    "airports": [
+     "SJJ"
+    ]
+   },
+   "SVQ": {
+    "name": "Seville",
+    "airports": [
+     "SVQ"
+    ]
+   },
+   "SSH": {
+    "name": "Sharm El Sheikh",
+    "airports": [
+     "SSH"
+    ]
+   },
+   "JSI": {
+    "name": "Skiathos",
+    "airports": [
+     "JSI"
+    ]
+   },
+   "STO": {
+    "name": "Stockholm",
+    "airports": [
+     "ARN",
+     "NYO"
+    ]
+   },
+   "STR": {
+    "name": "Stuttgart",
+    "airports": [
+     "STR"
+    ]
+   },
+   "TLV": {
+    "name": "Tel Aviv",
+    "airports": [
+     "TLV"
+    ]
+   },
+   "TFS": {
+    "name": "Tenerife (Canary Islands)",
+    "airports": [
+     "TFS"
+    ]
+   },
+   "SKG": {
+    "name": "Thessaloniki",
+    "airports": [
+     "SKG"
+    ]
+   },
+   "TSR": {
+    "name": "Timișoara",
+    "airports": [
+     "TSR"
+    ]
+   },
+   "TIA": {
+    "name": "Tirana",
+    "airports": [
+     "TIA"
+    ]
+   },
+   "TRN": {
+    "name": "Turin",
+    "airports": [
+     "TRN"
+    ]
+   },
+   "TKU": {
+    "name": "Turku",
+    "airports": [
+     "TKU"
+    ]
+   },
+   "VLC": {
+    "name": "Valencia",
+    "airports": [
+     "VLC"
+    ]
+   },
+   "WAW": {
+    "name": "Varșovia",
+    "airports": [
+     "WAW"
+    ]
+   },
+   "VCE": {
+    "name": "Veneția",
+    "airports": [
+     "TSF",
+     "VCE"
+    ]
+   },
+   "VIE": {
+    "name": "Viena",
+    "airports": [
+     "VIE"
+    ]
+   },
+   "WRO": {
+    "name": "Wroclaw",
+    "airports": [
+     "WRO"
+    ]
+   },
+   "EVN": {
+    "name": "Yerevan",
+    "airports": [
+     "EVN"
+    ]
+   },
+   "ZAD": {
+    "name": "Zadar",
+    "airports": [
+     "ZAD"
+    ]
+   },
+   "ZTH": {
+    "name": "Zakynthos",
+    "airports": [
+     "ZTH"
+    ]
+   },
+   "ZAZ": {
+    "name": "Zaragoza",
+    "airports": [
+     "ZAZ"
+    ]
+   },
+   "ZRH": {
+    "name": "Zürich",
+    "airports": [
+     "ZRH"
+    ]
+   }
+  }
+ }
+}

@@ -337,7 +337,7 @@ def answer(s, text: str) -> str:
     if plain(dest) in ("oriunde", "anywhere", "orice", "peste tot"):
         if len(o[1]) != 1 or o[1][0] not in MENU_ORIGINS:
             return "„Oriunde” merge din Chișinău, Iași sau București."
-        return search_anywhere(s, load_catalog(s), o[1][0], min_days, max_days, start, end, opts)
+        return search_anywhere(s, load_catalog(s, max_age_days=30), o[1][0], min_days, max_days, start, end, opts)
     d = resolve_city(s, dest)
     if not d:
         return f"Nu am găsit orașul „{html.escape(dest)}”."
@@ -584,23 +584,37 @@ def search_from_menu(s, catalog: dict, origin: str, place: str, lo: int, hi: int
                         *search_route(s, [origin], airports, lo, hi, start, end, opts))
 
 
-CATALOG_FILE = st.BASE_DIR / "routes_cache.json"
+CATALOG_FILE = st.BASE_DIR / "routes.json"  # în repo: îl citește și Worker-ul Cloudflare pentru meniu
 
 
-def load_catalog(s) -> dict:
-    """Catalogul de rute, recalculat o dată pe zi (durează ~40 s) și păstrat în routes_cache.json."""
+def save_catalog(catalog: dict, path=CATALOG_FILE) -> None:
+    path.write_text(json.dumps({"date": st.TODAY.isoformat(), "catalog": {
+        o: {p: {"name": v["name"], "airports": sorted(v["airports"])} for p, v in cities.items()}
+        for o, cities in catalog.items()}}, ensure_ascii=False, indent=1) + "\n")
+
+
+def load_catalog(s, max_age_days: int = 0) -> dict:
+    """Catalogul de rute din routes.json; recalculat (~40 s) dacă e mai vechi de max_age_days."""
     try:
         cached = json.loads(CATALOG_FILE.read_text())
-        if cached.get("date") == st.TODAY.isoformat():
+        if (st.TODAY - dt.date.fromisoformat(cached["date"])).days <= max_age_days:
             return {o: {p: {"name": v["name"], "airports": set(v["airports"])} for p, v in cities.items()}
                     for o, cities in cached["catalog"].items()}
     except Exception:  # noqa: BLE001
         pass
     catalog = route_catalog(s)
-    CATALOG_FILE.write_text(json.dumps({"date": st.TODAY.isoformat(), "catalog": {
-        o: {p: {"name": v["name"], "airports": sorted(v["airports"])} for p, v in cities.items()}
-        for o, cities in catalog.items()}}, ensure_ascii=False))
+    save_catalog(catalog)
     return catalog
+
+
+def run_button(s, catalog: dict, data: str) -> str:
+    """Căutarea pentru un buton „s:...” din meniu (folosit și de Worker-ul Cloudflare prin GitHub Actions)."""
+    parts = data.split(":")
+    token = parts[-1] if parse_window(parts[-1]) else window_token(*default_window())
+    origin, place, lo, hi = parts[1], parts[2], int(parts[3]), int(parts[4])
+    opts = Options.from_code(parts[5]) if len(parts) > 6 else Options()
+    start, end = parse_window(token)
+    return search_from_menu(s, catalog, origin, place, lo, hi, start, end, opts)
 
 
 class Session:
@@ -666,14 +680,16 @@ class Session:
             wait = "3–10 minute" if place == ANYWHERE else "1–2 minute"
             self.edit(msg, f"🔎 Caut <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>, "
                            f"{describe(lo, hi, opts)}, plecare {window_label(start, end)}... durează {wait}.")
-            send(self.s, search_from_menu(self.s, self.catalog, origin, place, lo, hi, start, end, opts),
-                 [[button("🔁 Altă căutare", "start")]])
+            send(self.s, run_button(self.s, self.catalog, data), [[button("🔁 Altă căutare", "start")]])
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--query", help="caută o rută și afișează rezultatul, fără Telegram")
     parser.add_argument("--menu", action="store_true", help="afișează destinațiile din meniu, fără Telegram")
+    parser.add_argument("--run-button", help="caută pentru un buton „s:...” și trimite rezultatul pe Telegram")
+    parser.add_argument("--run-text", help="caută pentru un mesaj text și trimite rezultatul pe Telegram")
+    parser.add_argument("--export-routes", help="scrie destinațiile cu zboruri directe în fișierul dat (routes.json)")
     parser.add_argument("--idle-minutes", type=float, default=10,
                         help="cât rămâne activ după ultimul mesaj, ca să răspundă instant la butoane")
     args = parser.parse_args()
@@ -682,6 +698,23 @@ def main() -> int:
 
     if args.query:
         print(re.sub(r"<[^>]+>", "", html.unescape(answer(s, args.query))))
+        return 0
+    if args.export_routes:
+        save_catalog(route_catalog(s), st.Path(args.export_routes))
+        return 0
+    if args.run_button or args.run_text:  # pornit de Worker-ul Cloudflare prin GitHub Actions
+        try:
+            if args.run_button:
+                text = run_button(s, load_catalog(s, max_age_days=30), args.run_button)
+            else:
+                text = answer(s, args.run_text)
+        except Exception as e:  # noqa: BLE001
+            log.exception("Eroare la căutare")
+            text = f"⚠️ A apărut o eroare la căutare: {html.escape(str(e))}"
+        if not (st.TELEGRAM_BOT_TOKEN and st.TELEGRAM_CHAT_ID):
+            print(re.sub(r"<[^>]+>", "", html.unescape(text)))
+            return 0
+        send(s, text, [[button("🔁 Altă căutare", "start")]])
         return 0
     if args.menu:
         for o, cities in route_catalog(s).items():

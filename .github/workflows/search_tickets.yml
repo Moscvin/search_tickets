@@ -1,9 +1,8 @@
 name: Bilete ieftine din Chișinău, Iași, București
 
 on:
-  schedule:
-    - cron: "0 6 * * 1"   # în fiecare luni la 06:00 UTC (09:00 ora Chișinăului vara, 08:00 iarna)
-  workflow_dispatch:       # buton "Run workflow" pentru rulare manuală
+  # pornit în fiecare luni la 06:00 UTC de Worker-ul Cloudflare (programările GitHub nu porneau)
+  workflow_dispatch:
 
 # o singură căutare odată: rulări paralele fac ca Wizz Air să blocheze cererile
 concurrency:

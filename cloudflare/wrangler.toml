@@ -1,0 +1,15 @@
+# Worker-ul Cloudflare al botului: meniul cu butoane răspunde instant, 24/7, gratuit (planul Free).
+# Căutarea propriu-zisă rulează pe GitHub Actions (.github/workflows/search_request.yml).
+name = "ticketplanebot"
+main = "src/worker.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+GITHUB_REPO = "Moscvin/search_tickets"
+
+# Programări (UTC): căutarea de luni și actualizarea zilnică a destinațiilor din meniu
+[triggers]
+crons = ["0 6 * * 1", "0 3 * * *"]
+
+# Secrete (setate cu `npx wrangler secret put NUME`, nu sunt în repo):
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, GITHUB_TOKEN, WEBHOOK_SECRET
