@@ -17,6 +17,7 @@ Rulare:  .venv/bin/python bot.py                          # răspunde la mesajel
 import argparse
 import datetime as dt
 import html
+import json
 import logging
 import re
 import sys
@@ -270,8 +271,10 @@ def route_catalog(s) -> dict[str, dict[str, dict]]:
             found["RMO"].update(f["destination"] for f in fares if f.get("connType") != 1)
 
     def hisky():
-        for org, dst in re.findall(r"var prices_([A-Z]{3})([A-Z]{3})\s*=", s.get("https://hisky.aero/").text):
-            if org in found:
+        routes = st.hisky_routes(s)
+        connecting = st.hisky_connecting(routes)  # ex. Chișinău → Cluj prin București
+        for org, dst in routes:
+            if org in found and (org, dst) not in connecting:
                 found[org].add(dst)
 
     def skyup():
@@ -283,10 +286,16 @@ def route_catalog(s) -> dict[str, dict[str, dict]]:
 
     for label, fn in (("Wizz", wizz), ("Ryanair", ryanair), ("FlyOne", flyone), ("HiSky", hisky), ("SkyUp", skyup)):
         collect(label, fn)
-    # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...), cu zboruri directe din Chișinău și București
+    # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...): doar dacă Kiwi găsește un zbor direct
     for o in MENU_ORIGINS:
-        if o in ("RMO", "OTP"):
-            found[o].update(d.strip() for d in st.KIWI_DESTINATIONS.split(",") if d.strip())
+        for d in (d.strip() for d in st.KIWI_DESTINATIONS.split(",")):
+            if not d or d in found[o] or st.city_of(d) == st.city_of(o):
+                continue
+            try:
+                if st.kiwi_has_direct(s, o, d):
+                    found[o].add(d)
+            except Exception as e:  # noqa: BLE001
+                log.warning("Kiwi %s-%s: %s", o, d, e)
 
     catalog: dict[str, dict[str, dict]] = {}
     for o, airports in found.items():
@@ -380,6 +389,25 @@ def search_from_menu(s, catalog: dict, origin: str, place: str, lo: int, hi: int
                         *search_route(s, [origin], airports, lo, hi))
 
 
+CATALOG_FILE = st.BASE_DIR / "routes_cache.json"
+
+
+def load_catalog(s) -> dict:
+    """Catalogul de rute, recalculat o dată pe zi (durează ~40 s) și păstrat în routes_cache.json."""
+    try:
+        cached = json.loads(CATALOG_FILE.read_text())
+        if cached.get("date") == st.TODAY.isoformat():
+            return {o: {p: {"name": v["name"], "airports": set(v["airports"])} for p, v in cities.items()}
+                    for o, cities in cached["catalog"].items()}
+    except Exception:  # noqa: BLE001
+        pass
+    catalog = route_catalog(s)
+    CATALOG_FILE.write_text(json.dumps({"date": st.TODAY.isoformat(), "catalog": {
+        o: {p: {"name": v["name"], "airports": sorted(v["airports"])} for p, v in cities.items()}
+        for o, cities in catalog.items()}}, ensure_ascii=False))
+    return catalog
+
+
 class Session:
     """Ține catalogul de rute încărcat cât timp botul e activ."""
 
@@ -390,7 +418,7 @@ class Session:
     @property
     def catalog(self) -> dict:
         if self._catalog is None:
-            self._catalog = route_catalog(self.s)
+            self._catalog = load_catalog(self.s)
         return self._catalog
 
     def edit(self, msg: dict, text: str, keyboard: list | None = None) -> None:
@@ -412,6 +440,8 @@ class Session:
         if data == "start":
             self.edit(msg, *menu_origins())
         elif parts[0] == "o":
+            if self._catalog is None and not CATALOG_FILE.exists():
+                self.edit(msg, "⏳ Verific ce zboruri directe există... (~1 minut, doar prima dată azi)")
             self.edit(msg, *menu_destinations(self.catalog, parts[1], 0))
         elif parts[0] == "p":
             self.edit(msg, *menu_destinations(self.catalog, parts[1], int(parts[2])))

@@ -415,17 +415,40 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
 
 # --------------------------------------------------------------------------- HiSky
 
-def search_hisky(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
-    # Pagina principală conține calendarul de prețuri: var prices_RMOSTN = JSON.parse(JSON.stringify([...]))
+def hisky_routes(s: requests.Session) -> dict[tuple[str, str], list[dict]]:
+    """Pagina principală HiSky conține calendarul de prețuri: var prices_RMOSTN = JSON.parse(JSON.stringify([...]))."""
     page = s.get("https://hisky.aero/").text
     blocks = re.findall(r"var prices_([A-Z]{3})([A-Z]{3})\s*=\s*JSON\.parse\(\s*JSON\.stringify\((\[.*?\])\)\s*\)",
                         page, re.S)
+    return {(org, dst): json.loads(raw) for org, dst, raw in blocks}
+
+
+def hisky_connecting(routes: dict[tuple[str, str], list[dict]]) -> set[tuple[str, str]]:
+    """Rutele HiSky care sunt de fapt cu escală (ex. Chișinău → Cluj prin București).
+
+    Un bilet A → B cu escală în H pleacă la aceeași oră ca zborul A → H, în aceleași zile."""
+    connecting = set()
+    for (a, b), fares in routes.items():
+        departures = {(f["date"], f["departure"]) for f in fares}
+        for (a2, hub) in routes:
+            if a2 != a or hub == b or (hub, b) not in routes:
+                continue
+            via_hub = {(f["date"], f["departure"]) for f in routes[(a, hub)]}
+            if departures and len(departures & via_hub) > len(departures) / 2:
+                connecting.add((a, b))
+                break
+    return connecting
+
+
+def search_hisky(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
+    routes = hisky_routes(s)
+    connecting = hisky_connecting(routes)
     flights = []
-    for org, dst, raw in blocks:
+    for (org, dst), fares in routes.items():
         for home in ORIGINS:
             if home not in (org, dst) or not wanted(dst if org == home else org):
                 continue
-            for f in json.loads(raw):
+            for f in fares:
                 price = float(str(f["price"]).replace(",", ""))
                 date = dt.datetime.strptime(f["date"], "%d.%m.%Y").date()
                 if price <= 0 or not in_range(date.isoformat()):
@@ -435,7 +458,7 @@ def search_hisky(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
                         f"&DepartureDate1={date:%d.%m.%Y}")
                 flights.append(Flight(
                     airline="HiSky", origin=org, destination=dst, date=date.isoformat(), home=home,
-                    price_eur=to_eur(price, "EUR", rates), link=link,
+                    price_eur=to_eur(price, "EUR", rates), link=link, direct=(org, dst) not in connecting,
                 ))
     log.info("HiSky: %d prețuri", len(flights))
     return flights
@@ -517,6 +540,34 @@ KIWI_QUERY = """query SearchReturnItinerariesQuery($search: SearchReturnInput, $
     ... on AppError { error: message }
   }
 }"""
+
+
+def kiwi_has_direct(s: requests.Session, home: str, dest: str) -> bool:
+    """Există vreun zbor direct dus-întors home ↔ dest (orice companie) în următoarele DAYS_AHEAD zile?"""
+    variables = {
+        "search": {
+            "itinerary": {
+                "source": {"ids": [f"Station:airport:{home}"]},
+                "destination": {"ids": [f"Station:airport:{dest}"]},
+                "outboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
+                                          "end": f"{LAST_OUTBOUND}T23:59:59"},
+                "inboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
+                                         "end": f"{LAST_OUTBOUND + dt.timedelta(days=30)}T23:59:59"},
+            },
+            "passengers": {"adults": 1, "children": 0, "infants": 0, "adultsHoldBags": [0],
+                           "adultsHandBags": [0], "childrenHoldBags": [], "childrenHandBags": []},
+            "cabinClass": {"cabinClass": "ECONOMY", "applyMixedClasses": False},
+        },
+        "filter": {"transportTypes": ["FLIGHT"], "contentProviders": ["KIWI"], "limit": 1, "maxStopsCount": 0},
+        "options": {"sortBy": "PRICE", "currency": "eur", "locale": "en", "market": "md", "partner": "skypicker",
+                    "partnerMarket": "md", "storeSearch": False, "searchStrategy": "REDUCED", "abTestInput": {}},
+    }
+    r = s.post("https://api.skypicker.com/umbrella/v2/graphql?featureName=SearchReturnItinerariesQuery",
+               json={"query": KIWI_QUERY, "variables": variables},
+               headers={"origin": "https://www.kiwi.com", "referer": "https://www.kiwi.com/"}, timeout=60)
+    r.raise_for_status()
+    result = (r.json().get("data") or {}).get("returnItineraries") or {}
+    return bool(result.get("itineraries"))
 
 
 def search_kiwi(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
