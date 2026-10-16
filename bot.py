@@ -34,7 +34,8 @@ HELP = (
     "✈️ Scrie-mi ruta și câte zile vrei să stai, de exemplu:\n"
     "• <code>Chișinău - Dubai 7 zile</code>\n"
     "• <code>Iași - Milano 3-5 zile</code>\n"
-    "• <code>București Londra 4</code>\n\n"
+    "• <code>București Londra 4</code>\n"
+    "• <code>Chișinău - Roma 5 zile 2 luni</code> (caută plecări doar în următoarele 2 luni)\n\n"
     f"Caut dus-întors în următoarele {st.DAYS_AHEAD} de zile, la toate companiile "
     "(Wizz Air, Ryanair, FlyOne, HiSky, SkyUp și restul prin Kiwi.com), "
     "și îți trimit cele mai ieftine date, doar cu zboruri directe. Fără zile, caut "
@@ -60,10 +61,30 @@ def plain(text: str) -> str:
 
 # --------------------------------------------------------------------------- înțelegerea mesajului
 
-def parse_query(text: str) -> tuple[str, str, int, int] | None:
-    """„Chișinău - Dubai 7 zile” → ("Chișinău", "Dubai", 7, 7)."""
+PERIOD_OPTIONS = [("1 lună", 30), ("2 luni", 60), ("3 luni", 90), ("6 luni", 180), ("9 luni", 270), ("1 an", 365)]
+
+
+def period_label(days: int) -> str:
+    """Perioada, gata de pus după „în”: „următoarea lună”, „următoarele 3 luni”, „următorul an”."""
+    if days == 30:
+        return "următoarea lună"
+    if days == 365:
+        return "următorul an"
+    label = next((label for label, d in PERIOD_OPTIONS if d == days), f"{days} zile")
+    return f"următoarele {label}"
+
+
+def parse_query(text: str) -> tuple[str, str, int, int, int] | None:
+    """„Chișinău - Dubai 7 zile 3 luni” → ("Chișinău", "Dubai", 7, 7, 90). Perioada implicită: DAYS_AHEAD."""
     text = text.strip()
     min_days, max_days = st.TRIP_MIN_DAYS, st.TRIP_MAX_DAYS
+    horizon = st.DAYS_AHEAD
+    m = re.search(r"(?:în\s+|in\s+|pe\s+)?(?:următoarele\s+|urmatoarele\s+)?(\d{1,2})\s*"
+                  r"(luni|lună|luna|an|ani|săptămâni|saptamani|săpt|sapt)\b", text, re.I)
+    if m:
+        n, unit = int(m.group(1)), plain(m.group(2))
+        horizon = n * (365 if unit.startswith("an") else 7 if unit.startswith("sapt") else 30)
+        text = (text[:m.start()] + " " + text[m.end():]).strip()
     m = re.search(r"(\d{1,2})\s*(?:-|–|—|\.\.)\s*(\d{1,2})\s*(?:zile|zi|nopti|nopți|nights|days|z)?\s*$", text, re.I)
     if m:
         min_days, max_days = sorted((int(m.group(1)), int(m.group(2))))
@@ -80,9 +101,9 @@ def parse_query(text: str) -> tuple[str, str, int, int] | None:
         if len(words) != 2:
             return None
         parts = words
-    if not (1 <= min_days <= max_days <= 30):
+    if not (1 <= min_days <= max_days <= 30) or not (7 <= horizon <= 365):
         return None
-    return parts[0], parts[1], min_days, max_days
+    return parts[0], parts[1], min_days, max_days, horizon
 
 
 PLACES_QUERY = """query UmbrellaPlacesQuery($search: PlacesSearchInput, $filter: PlacesFilterInput,
@@ -134,7 +155,8 @@ def resolve_city(s, name: str) -> tuple[str, list[str]] | None:
 
 # --------------------------------------------------------------------------- căutarea
 
-def search_route(s, origins: list[str], destinations: list[str], min_days: int, max_days: int) -> tuple[list, list, list]:
+def search_route(s, origins: list[str], destinations: list[str], min_days: int, max_days: int,
+                 horizon: int) -> tuple[list, list, list]:
     """Toate sursele, limitate la o rută.
 
     Întoarce (variante directe, variante cu escală dacă nu există directe, erori), sortate după preț."""
@@ -142,6 +164,8 @@ def search_route(s, origins: list[str], destinations: list[str], min_days: int, 
     st.ROUTE_DESTINATIONS = set(destinations)
     st.KIWI_DESTINATIONS = ",".join(destinations)
     st.TRIP_MIN_DAYS, st.TRIP_MAX_DAYS = min_days, max_days
+    st.DAYS_AHEAD = horizon
+    st.LAST_OUTBOUND = st.TODAY + dt.timedelta(days=horizon)
     st.LAST_DATE = st.LAST_OUTBOUND + dt.timedelta(days=max_days)
 
     rates = st.eur_rates(s)
@@ -185,12 +209,12 @@ def format_reply(origin_name: str, dest_name: str, min_days: int, max_days: int,
     days = f"{min_days}" if min_days == max_days else f"{min_days}–{max_days}"
     route = f"{html.escape(origin_name)} → {html.escape(dest_name)}"
     lines = [f"✈️ <b>{route}</b>, dus-întors, {days} zile, doar zboruri directe\n"
-             f"(plecare în următoarele {st.DAYS_AHEAD} zile)\n"]
+             f"(plecare în {period_label(st.DAYS_AHEAD)})\n"]
     if direct:
         lines += [line.replace(" 🆕", "") for line in st.trip_lines(pick(direct, RESULTS), {})]
     else:
         lines.append(f"❌ <b>Nu există zboruri directe {route}</b> dus-întors de {days} zile "
-                     f"în următoarele {st.DAYS_AHEAD} zile.")
+                     f"în {period_label(st.DAYS_AHEAD)}.")
         if with_stops:
             lines.append("Cele mai ieftine variante <b>cu escală</b>:")
             lines += [line.replace(" 🆕", "") for line in st.trip_lines(pick(with_stops, 3), {})]
@@ -207,7 +231,7 @@ def answer(s, text: str) -> str:
     parsed = parse_query(text)
     if not parsed:
         return "Nu am înțeles ruta. 🤔\n\n" + HELP
-    origin, dest, min_days, max_days = parsed
+    origin, dest, min_days, max_days, horizon = parsed
     o = resolve_city(s, origin)
     d = resolve_city(s, dest)
     if not o:
@@ -215,7 +239,7 @@ def answer(s, text: str) -> str:
     if not d:
         return f"Nu am găsit orașul „{html.escape(dest)}”."
     log.info("Caut %s %s → %s %s, %d-%d zile", o[0], o[1], d[0], d[1], min_days, max_days)
-    return format_reply(o[0], d[0], min_days, max_days, *search_route(s, o[1], d[1], min_days, max_days))
+    return format_reply(o[0], d[0], min_days, max_days, *search_route(s, o[1], d[1], min_days, max_days, horizon))
 
 
 # --------------------------------------------------------------------------- rutele directe (pentru meniu)
@@ -374,19 +398,29 @@ def menu_destinations(catalog: dict, origin: str, page: int) -> tuple[str, list]
 
 def menu_days(catalog: dict, origin: str, place: str) -> tuple[str, list]:
     name = catalog.get(origin, {}).get(place, {}).get("name", place)
-    row = [button(label, f"s:{origin}:{place}:{lo}:{hi}") for label, lo, hi in DAY_OPTIONS]
+    row = [button(label, f"h:{origin}:{place}:{lo}:{hi}") for label, lo, hi in DAY_OPTIONS]
     keyboard = [row[i:i + 4] for i in range(0, len(row), 4)]
     keyboard.append([button("◀️ Alt oraș destinație", f"o:{origin}")])
     return f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>\nCâte zile stai?", keyboard
 
 
-def search_from_menu(s, catalog: dict, origin: str, place: str, lo: int, hi: int) -> str:
+def menu_period(catalog: dict, origin: str, place: str, lo: int, hi: int) -> tuple[str, list]:
+    name = catalog.get(origin, {}).get(place, {}).get("name", place)
+    row = [button(label, f"s:{origin}:{place}:{lo}:{hi}:{days}") for label, days in PERIOD_OPTIONS]
+    keyboard = [row[i:i + 3] for i in range(0, len(row), 3)]
+    keyboard.append([button("◀️ Alte zile", f"c:{origin}:{place}")])
+    stay = f"{lo}" if lo == hi else f"{lo}–{hi}"
+    return (f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>, {stay} zile\n"
+            "În ce perioadă să caut plecarea?"), keyboard
+
+
+def search_from_menu(s, catalog: dict, origin: str, place: str, lo: int, hi: int, horizon: int) -> str:
     info = catalog.get(origin, {}).get(place)
     if not info:
         return "Nu mai găsesc această rută. Încearcă din nou cu /start."
     airports = sorted(info["airports"] | set(st.CITY_AIRPORTS.get(place, ("", []))[1]))
     return format_reply(st.ORIGIN_NAMES.get(origin, origin), info["name"], lo, hi,
-                        *search_route(s, [origin], airports, lo, hi))
+                        *search_route(s, [origin], airports, lo, hi, horizon))
 
 
 CATALOG_FILE = st.BASE_DIR / "routes_cache.json"
@@ -447,13 +481,16 @@ class Session:
             self.edit(msg, *menu_destinations(self.catalog, parts[1], int(parts[2])))
         elif parts[0] == "c":
             self.edit(msg, *menu_days(self.catalog, parts[1], parts[2]))
+        elif parts[0] == "h":
+            self.edit(msg, *menu_period(self.catalog, parts[1], parts[2], int(parts[3]), int(parts[4])))
         elif parts[0] == "s":
             origin, place, lo, hi = parts[1], parts[2], int(parts[3]), int(parts[4])
+            horizon = int(parts[5]) if len(parts) > 5 else st.DAYS_AHEAD
             name = self.catalog.get(origin, {}).get(place, {}).get("name", place)
             days = f"{lo}" if lo == hi else f"{lo}–{hi}"
             self.edit(msg, f"🔎 Caut <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>, "
-                           f"{days} zile... durează 1–2 minute.")
-            send(self.s, search_from_menu(self.s, self.catalog, origin, place, lo, hi),
+                           f"{days} zile, în {period_label(horizon)}... durează 1–2 minute.")
+            send(self.s, search_from_menu(self.s, self.catalog, origin, place, lo, hi, horizon),
                  [[button("🔁 Altă căutare", "start")]])
 
 
