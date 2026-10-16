@@ -490,7 +490,13 @@ def main() -> int:
         params = {"timeout": wait, "allowed_updates": ["message", "callback_query"]}
         if offset is not None:
             params["offset"] = offset
-        updates = tg(s, "getUpdates", **params)
+        try:
+            updates = tg(s, "getUpdates", **params)
+        except Exception as e:  # noqa: BLE001
+            # o întrerupere de rețea nu oprește sesiunea: reîncercăm la următorul pas
+            log.warning("getUpdates: %s", e)
+            updates = []
+            time.sleep(5)
         if updates:
             offset = updates[-1]["update_id"] + 1
             # confirmăm imediat, ca o eroare să nu proceseze aceleași mesaje la nesfârșit
