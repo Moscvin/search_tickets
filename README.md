@@ -32,10 +32,12 @@ Dusul și întorsul se pot combina între companii și între aeroporturile acel
 Ora rulării se schimbă în [.github/workflows/search_tickets.yml](.github/workflows/search_tickets.yml) (`cron`, în UTC).
 
 ## 3. Întreabă botul o rută
-Scrie-i botului `/start` (sau orice mesaj) și alege din butoane: **de unde** (Chișinău / Iași / București)
-→ **unde** (doar orașele cu zboruri directe) → **câte zile** → **în ce perioadă** (1 lună … 1 an). Botul trimite cele mai ieftine date dus-întors cu zboruri directe;
+Scrie-i botului `/start` (sau orice mesaj) și alege din butoane: **din ce lună** → **până în ce lună** pleci
+(ex. aprilie – octombrie 2027) → **de unde** (Chișinău / Iași / București) → **unde** (doar orașele cu zboruri directe)
+→ **câte zile**. Botul trimite cele mai ieftine date dus-întors cu zboruri directe din intervalul ales;
 dacă pe rută nu există zbor direct, îți scrie asta și îți arată cele mai ieftine variante cu escală.
-Poți scrie și direct, de exemplu `Chișinău - Dubai 7 zile`, `Iași - Milano 3-5 zile` sau `Chișinău - Roma 5 zile 2 luni`.
+Poți scrie și direct, de exemplu `Chișinău - Dubai 7 zile`, `Iași - Milano 3-5 zile 2 luni` sau
+`Chișinău - Roma 5 zile peste 6-12 luni`.
 
 Botul rulează din [.github/workflows/bot.yml](.github/workflows/bot.yml): verifică mesajele la ~5 minute,
 deci primul răspuns poate veni după câteva minute; apoi rămâne activ ~10 minute și răspunde instant la butoane.

@@ -73,6 +73,7 @@ def wanted(airport: str) -> bool:
 
 
 TODAY = dt.date.today()
+FIRST_OUTBOUND = TODAY  # prima zi de plecare (bot.py o poate muta în viitor, ex. peste 6 luni)
 LAST_OUTBOUND = TODAY + dt.timedelta(days=DAYS_AHEAD)
 LAST_DATE = LAST_OUTBOUND + dt.timedelta(days=TRIP_MAX_DAYS)  # orizontul de căutare pentru întoarceri
 
@@ -236,7 +237,7 @@ def search_wizzair(s: requests.Session, rates: dict, names: dict) -> list[Flight
         for dest in destinations:
             if consecutive_failures >= 4:
                 raise RuntimeError(f"Wizz Air blochează cererile ({consecutive_failures} eșecuri la rând)")
-            start = TODAY
+            start = FIRST_OUTBOUND
             while start <= LAST_DATE:
                 end = min(start + dt.timedelta(days=41), LAST_DATE)  # Wizz acceptă maxim ~42 de zile pe cerere
                 period = {"from": start.isoformat(), "to": end.isoformat()}
@@ -296,8 +297,9 @@ def search_ryanair(s: requests.Session, rates: dict, names: dict) -> list[Flight
             # cel mai ieftin dus-întors de TRIP_MIN_DAYS..TRIP_MAX_DAYS zile pe această rută
             params = {
                 "departureAirportIataCode": home, "arrivalAirportIataCode": dest,
-                "outboundDepartureDateFrom": TODAY.isoformat(), "outboundDepartureDateTo": LAST_OUTBOUND.isoformat(),
-                "inboundDepartureDateFrom": TODAY.isoformat(), "inboundDepartureDateTo": LAST_DATE.isoformat(),
+                "outboundDepartureDateFrom": FIRST_OUTBOUND.isoformat(),
+                "outboundDepartureDateTo": LAST_OUTBOUND.isoformat(),
+                "inboundDepartureDateFrom": FIRST_OUTBOUND.isoformat(), "inboundDepartureDateTo": LAST_DATE.isoformat(),
                 "durationFrom": TRIP_MIN_DAYS, "durationTo": TRIP_MAX_DAYS,
                 "currency": "EUR", "market": "en-gb", "adultPaxCount": 1,
             }
@@ -351,13 +353,14 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
             "startDate": date, "endDate": date,
         })
 
-    months = month_starts(TODAY, LAST_DATE)
+    months = month_starts(FIRST_OUTBOUND, LAST_DATE)
     flights = []
     for home in ORIGINS:
         # 1) destinațiile care au tarife (cel mai mic preț pe destinație, pe lună)
         destinations: dict[str, bool] = {}  # destinație -> zbor direct (connType 1 = cu escală, ex. Moscova)
         for month in months:
-            body = {"token": token, "origin": home, "travelDate": max(month, TODAY).isoformat(), "currencyCode": "EUR"}
+            body = {"token": token, "origin": home, "travelDate": max(month, FIRST_OUTBOUND).isoformat(),
+                    "currencyCode": "EUR"}
             r = s.post(f"{api}/search/get-route-fare", json=body, headers=headers)
             r.raise_for_status()
             for f in r.json().get("destinationFares") or []:
@@ -371,7 +374,7 @@ def search_flyone(s: requests.Session, rates: dict, names: dict) -> list[Flight]
         # 2) calendarul de prețuri pe zile, dus și întors, pentru fiecare destinație și lună
         for dest, direct in destinations.items():
             for month in months:
-                travel = max(month, TODAY).isoformat()
+                travel = max(month, FIRST_OUTBOUND).isoformat()
                 body = {
                     "currencyCode": "EUR",
                     "searchCriteria": {
@@ -492,7 +495,7 @@ def search_skyup(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
             # un singur apel întoarce calendarul pe zile pentru ambele direcții
             body = {
                 "AirlineCode": "U5", "OriginCityCode": home, "DestinationCityCode": dest,
-                "Date": TODAY.isoformat(), "EndDate": LAST_DATE.isoformat(), "needReturnFlights": True,
+                "Date": FIRST_OUTBOUND.isoformat(), "EndDate": LAST_DATE.isoformat(), "needReturnFlights": True,
                 "originAndDestIsAirports": True, "TotalPaxCount": 1, "DayRange": 1,
                 "PaxCountDetails": [{"PaxType": "ADULT", "PaxCount": 1}], "PointOfPurchase": "PL",
             }
@@ -583,9 +586,9 @@ def search_kiwi(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
                     "itinerary": {
                         "source": {"ids": [f"Station:airport:{home}"]},
                         "destination": {"ids": [f"Station:airport:{dest}"]},
-                        "outboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
+                        "outboundDepartureDate": {"start": f"{max(FIRST_OUTBOUND, TODAY + dt.timedelta(days=1))}T00:00:00",
                                                   "end": f"{LAST_OUTBOUND}T23:59:59"},
-                        "inboundDepartureDate": {"start": f"{TODAY + dt.timedelta(days=1)}T00:00:00",
+                        "inboundDepartureDate": {"start": f"{max(FIRST_OUTBOUND, TODAY + dt.timedelta(days=1))}T00:00:00",
                                                  "end": f"{LAST_DATE}T23:59:59"},
                         "nightsCount": {"start": TRIP_MIN_DAYS, "end": TRIP_MAX_DAYS},
                     },
@@ -642,7 +645,7 @@ def search_aviasales(s: requests.Session, rates: dict, names: dict) -> list[Flig
         return []
     flights = []
     for home in ORIGINS:
-        for month in month_starts(TODAY, LAST_OUTBOUND):
+        for month in month_starts(FIRST_OUTBOUND, LAST_OUTBOUND):
             r = s.get("https://api.travelpayouts.com/aviasales/v3/prices_for_dates", params={
                 "origin": home, "departure_at": month.strftime("%Y-%m"), "one_way": "false", "direct": "false",
                 "sorting": "price", "currency": "eur", "limit": 1000, "token": TRAVELPAYOUTS_TOKEN,
@@ -696,10 +699,10 @@ def all_trips(flights: list[Flight], names: dict, direct_only: bool | None = Non
         if direct_only and not f.direct:
             continue
         if f.return_date:  # ofertă dus-întors gata făcută
-            if f.date <= LAST_OUTBOUND.isoformat() and stay_ok(f.date, f.return_date):
+            if FIRST_OUTBOUND.isoformat() <= f.date <= LAST_OUTBOUND.isoformat() and stay_ok(f.date, f.return_date):
                 add(Trip(f.home, f.place, city_name(f.place, names), f, None, f.price_eur))
             continue
-        if f.outbound and f.date > LAST_OUTBOUND.isoformat():
+        if f.outbound and not FIRST_OUTBOUND.isoformat() <= f.date <= LAST_OUTBOUND.isoformat():
             continue
         key = (f.home, f.place, f.outbound, f.airport, f.date)
         if key not in cheapest or f.price_eur < cheapest[key].price_eur:
