@@ -3,3 +3,5 @@
 __pycache__/
 last_prices.json
 last_results.json
+cloudflare/node_modules/
+cloudflare/.wrangler/
