@@ -61,6 +61,18 @@ TRIP_MIN_DAYS = env_int("TRIP_MIN_DAYS", 2)     # întoarcerea: minim N zile dup
 TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 7)     # întoarcerea: maxim N zile după plecare
 MAX_PRICE_EUR = float(os.environ.get("MAX_PRICE_EUR") or 0)  # preț total maxim, 0 = fără limită
 TOP_N = env_int("TOP_N", 15)                    # câte destinații pentru fiecare oraș de plecare
+# Pasagerii (bot.py îi poate schimba): prețurile sunt per persoană, totalul se înmulțește cu PASSENGERS
+ADULTS = 1
+CHILDREN = 0  # 2–11 ani
+
+
+def passengers() -> int:
+    return ADULTS + CHILDREN
+
+
+# Doar weekend: plecare vineri/sâmbătă, întoarcere duminică/luni (bot.py)
+WEEKEND_ONLY = False
+
 # Doar zboruri directe (fără escală); DIRECT_ONLY=false le include și pe cele cu escală
 DIRECT_ONLY = (os.environ.get("DIRECT_ONLY") or "true").lower() not in ("0", "false", "nu", "no")
 
@@ -191,7 +203,7 @@ def month_starts(first: dt.date, last: dt.date) -> list[dt.date]:
 
 
 def wizz_link(org: str, dst: str, date: str, ret: str = "null") -> str:
-    return f"https://wizzair.com/en-gb/booking/select-flight/{org}/{dst}/{date}/{ret}/1/0/0/null"
+    return f"https://wizzair.com/en-gb/booking/select-flight/{org}/{dst}/{date}/{ret}/{ADULTS}/{CHILDREN}/0/null"
 
 
 # --------------------------------------------------------------------------- Wizz Air
@@ -274,7 +286,7 @@ def search_wizzair(s: requests.Session, rates: dict, names: dict) -> list[Flight
 
 def ryanair_link(org: str, dst: str, date: str, back: str = "") -> str:
     return "https://www.ryanair.com/gb/en/trip/flights/select?" + urlencode({
-        "adults": 1, "teens": 0, "children": 0, "infants": 0, "dateOut": date, "dateIn": back,
+        "adults": ADULTS, "teens": 0, "children": CHILDREN, "infants": 0, "dateOut": date, "dateIn": back,
         "isConnectedFlight": "false", "isReturn": "true" if back else "false", "discount": 0,
         "originIata": org, "destinationIata": dst,
     })
@@ -457,7 +469,7 @@ def search_hisky(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
                 if price <= 0 or not in_range(date.isoformat()):
                     continue
                 link = ("https://booking.hisky.aero/VARS/Public/deeplink.aspx?TripType=oneway&UserLanguage=ro"
-                        f"&Adult=1&Child=0&InfantLap=0&UserCurrency=EUR&Origin1={org}&Destination1={dst}"
+                        f"&Adult={ADULTS}&Child={CHILDREN}&InfantLap=0&UserCurrency=EUR&Origin1={org}&Destination1={dst}"
                         f"&DepartureDate1={date:%d.%m.%Y}")
                 flights.append(Flight(
                     airline="HiSky", origin=org, destination=dst, date=date.isoformat(), home=home,
@@ -473,7 +485,8 @@ def skyup_link(org: str, dst: str, date: str, back: str = "") -> str:
     params = {"departure_city": org, "arrival_city": dst, "date_forward": date}
     if back:
         params["date_backward"] = back
-    return "https://skyup.aero/en/booking/flights?" + urlencode({**params, "adults": 1, "children": 0, "infants": 0})
+    return "https://skyup.aero/en/booking/flights?" + urlencode({**params, "adults": ADULTS, "children": CHILDREN,
+                                                                "infants": 0})
 
 
 def search_skyup(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
@@ -592,8 +605,9 @@ def search_kiwi(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
                                                  "end": f"{LAST_DATE}T23:59:59"},
                         "nightsCount": {"start": TRIP_MIN_DAYS, "end": TRIP_MAX_DAYS},
                     },
-                    "passengers": {"adults": 1, "children": 0, "infants": 0, "adultsHoldBags": [0],
-                                   "adultsHandBags": [0], "childrenHoldBags": [], "childrenHandBags": []},
+                    "passengers": {"adults": ADULTS, "children": CHILDREN, "infants": 0,
+                                   "adultsHoldBags": [0] * ADULTS, "adultsHandBags": [0] * ADULTS,
+                                   "childrenHoldBags": [0] * CHILDREN, "childrenHandBags": [0] * CHILDREN},
                     "cabinClass": {"cabinClass": "ECONOMY", "applyMixedClasses": False},
                 },
                 "filter": {"allowDifferentStationConnection": True, "enableSelfTransfer": True,
@@ -626,7 +640,8 @@ def search_kiwi(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
                 flights.append(Flight(
                     airline=" + ".join(carriers) + " (Kiwi)", origin=home, destination=arrival["code"],
                     date=out[0]["source"]["localTime"][:10], home=home,
-                    price_eur=to_eur(float(it["price"]["amount"]), "EUR", rates),
+                    # Kiwi dă prețul pentru tot grupul; îl păstrăm per persoană, ca la celelalte surse
+                    price_eur=round(to_eur(float(it["price"]["amount"]), "EUR", rates) / passengers(), 2),
                     link="https://www.kiwi.com" + edges[0]["node"]["bookingUrl"],
                     direct=len(out) == 1 and len(back) == 1,
                     return_date=back[0]["source"]["localTime"][:10],
@@ -675,8 +690,10 @@ SOURCES = [search_wizzair, search_ryanair, search_flyone, search_hisky, search_s
 # --------------------------------------------------------------------------- combinare dus + întors
 
 def stay_ok(out_date: str, back_date: str) -> bool:
-    days = (dt.date.fromisoformat(back_date) - dt.date.fromisoformat(out_date)).days
-    return TRIP_MIN_DAYS <= days <= TRIP_MAX_DAYS
+    out, back = dt.date.fromisoformat(out_date), dt.date.fromisoformat(back_date)
+    if WEEKEND_ONLY and (out.weekday() not in (4, 5) or back.weekday() not in (6, 0)):  # Vi/Sâ → Du/Lu
+        return False
+    return TRIP_MIN_DAYS <= (back - out).days <= TRIP_MAX_DAYS
 
 
 def all_trips(flights: list[Flight], names: dict, direct_only: bool | None = None) -> list[Trip]:
@@ -769,8 +786,11 @@ def trip_lines(top: list[Trip], previous: dict) -> list[str]:
         nights = (dt.date.fromisoformat(t.back.date if t.back else t.out.return_date)
                   - dt.date.fromisoformat(t.out.date)).days
         home_name = html.escape(ORIGIN_NAMES.get(t.home, t.home))
+        price = f"€{t.total_eur:.0f} dus-întors"
+        if passengers() > 1:
+            price = f"€{t.total_eur * passengers():.0f} dus-întors pentru {passengers()} pers. (€{t.total_eur:.0f}/pers.)"
         line = (f"{i}. <b>{home_name} → {html.escape(t.place_name)}</b> — "
-                f"<b>€{t.total_eur:.0f} dus-întors</b>{trend} · {nights} nopți\n")
+                f"<b>{price}</b>{trend} · {nights} {'noapte' if nights == 1 else 'nopți'}\n")
         if t.back:
             line += leg_line("🛫", t.out) + "\n" + leg_line("🛬", t.back)
             if t.link:
