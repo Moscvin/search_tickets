@@ -1,5 +1,5 @@
 {
- "date": "2026-10-18",
+ "date": "2026-10-19",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -456,12 +456,6 @@
      "DTM"
     ]
    },
-   "DXB": {
-    "name": "Dubai",
-    "airports": [
-     "DXB"
-    ]
-   },
    "DUB": {
     "name": "Dublin",
     "airports": [
@@ -472,6 +466,12 @@
     "name": "Eindhoven",
     "airports": [
      "EIN"
+    ]
+   },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
     ]
    },
    "IST": {
