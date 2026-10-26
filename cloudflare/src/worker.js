@@ -106,7 +106,7 @@ const MONTHS = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "i
   "octombrie", "noiembrie", "decembrie"];
 const MONTHS_SHORT = ["ian", "feb", "mar", "apr", "mai", "iun", "iul", "aug", "sep", "oct", "noi", "dec"];
 const DAY_OPTIONS = [["2", 2, 2], ["3", 3, 3], ["4", 4, 4], ["5", 5, 5], ["6", 6, 6], ["7", 7, 7],
-  ["10", 10, 10], ["14", 14, 14], ["2–4", 2, 4], ["2–7", 2, 7], ["5–10", 5, 10]];
+  ["10", 10, 10], ["14", 14, 14], ["2–4", 2, 4], ["2–7", 2, 7], ["5–10", 5, 10], ["11–20", 11, 20]];
 const PAX_OPTIONS = [["1 adult", 1, 0], ["2 adulți", 2, 0], ["3 adulți", 3, 0], ["4 adulți", 4, 0],
   ["1 adult + 1 copil", 1, 1], ["2 adulți + 1 copil", 2, 1], ["2 adulți + 2 copii", 2, 2],
   ["2 adulți + 3 copii", 2, 3]];
