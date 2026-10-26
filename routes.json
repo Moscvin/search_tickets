@@ -1241,6 +1241,24 @@
      "AUH"
     ]
    },
+   "ABV": {
+    "name": "ABV",
+    "airports": [
+     "ABV"
+    ]
+   },
+   "ACC": {
+    "name": "ACC",
+    "airports": [
+     "ACC"
+    ]
+   },
+   "ADD": {
+    "name": "ADD",
+    "airports": [
+     "ADD"
+    ]
+   },
    "ALG": {
     "name": "ALG",
     "airports": [
@@ -1265,28 +1283,22 @@
      "AMS"
     ]
    },
-   "ESB": {
-    "name": "Ankara",
+   "ASB": {
+    "name": "ASB",
     "airports": [
-     "ESB"
-    ]
-   },
-   "AYT": {
-    "name": "Antalya",
-    "airports": [
-     "AYT"
-    ]
-   },
-   "ASR": {
-    "name": "ASR",
-    "airports": [
-     "ASR"
+     "ASB"
     ]
    },
    "ATH": {
     "name": "Atena",
     "airports": [
      "ATH"
+    ]
+   },
+   "ATL": {
+    "name": "ATL",
+    "airports": [
+     "ATL"
     ]
    },
    "BAH": {
@@ -1319,6 +1331,12 @@
      "BSL"
     ]
    },
+   "BUS": {
+    "name": "Batumi",
+    "airports": [
+     "BUS"
+    ]
+   },
    "BEG": {
     "name": "Belgrade",
     "airports": [
@@ -1337,16 +1355,52 @@
      "BEY"
     ]
    },
-   "BJV": {
-    "name": "Bodrum",
+   "BGW": {
+    "name": "BGW",
     "airports": [
-     "BJV"
+     "BGW"
+    ]
+   },
+   "BIO": {
+    "name": "Bilbao",
+    "airports": [
+     "BIO"
+    ]
+   },
+   "BHX": {
+    "name": "Birmingham",
+    "airports": [
+     "BHX"
+    ]
+   },
+   "BKK": {
+    "name": "BKK",
+    "airports": [
+     "BKK"
     ]
    },
    "BLQ": {
     "name": "Bologna",
     "airports": [
      "BLQ"
+    ]
+   },
+   "BOM": {
+    "name": "BOM",
+    "airports": [
+     "BOM"
+    ]
+   },
+   "BOD": {
+    "name": "Bordeaux",
+    "airports": [
+     "BOD"
+    ]
+   },
+   "BOS": {
+    "name": "BOS",
+    "airports": [
+     "BOS"
     ]
    },
    "BRU": {
@@ -1373,10 +1427,28 @@
      "CAI"
     ]
    },
+   "CAN": {
+    "name": "CAN",
+    "airports": [
+     "CAN"
+    ]
+   },
    "CTA": {
     "name": "Catania (Sicily)",
     "airports": [
      "CTA"
+    ]
+   },
+   "CCS": {
+    "name": "CCS",
+    "airports": [
+     "CCS"
+    ]
+   },
+   "CGK": {
+    "name": "CGK",
+    "airports": [
+     "CGK"
     ]
    },
    "CLJ": {
@@ -1385,10 +1457,22 @@
      "CLJ"
     ]
    },
+   "CMB": {
+    "name": "CMB",
+    "airports": [
+     "CMB"
+    ]
+   },
    "CMN": {
     "name": "CMN",
     "airports": [
      "CMN"
+    ]
+   },
+   "CND": {
+    "name": "Constanța",
+    "airports": [
+     "CND"
     ]
    },
    "CPH": {
@@ -1397,10 +1481,28 @@
      "CPH"
     ]
    },
-   "DLM": {
-    "name": "Dalaman",
+   "CPT": {
+    "name": "CPT",
     "airports": [
-     "DLM"
+     "CPT"
+    ]
+   },
+   "CUN": {
+    "name": "CUN",
+    "airports": [
+     "CUN"
+    ]
+   },
+   "DAC": {
+    "name": "DAC",
+    "airports": [
+     "DAC"
+    ]
+   },
+   "DAR": {
+    "name": "DAR",
+    "airports": [
+     "DAR"
     ]
    },
    "DEB": {
@@ -1409,10 +1511,40 @@
      "DEB"
     ]
    },
+   "DEL": {
+    "name": "DEL",
+    "airports": [
+     "DEL"
+    ]
+   },
+   "DFW": {
+    "name": "DFW",
+    "airports": [
+     "DFW"
+    ]
+   },
+   "DMM": {
+    "name": "DMM",
+    "airports": [
+     "DMM"
+    ]
+   },
    "DOH": {
     "name": "DOH",
     "airports": [
      "DOH"
+    ]
+   },
+   "DPS": {
+    "name": "DPS",
+    "airports": [
+     "DPS"
+    ]
+   },
+   "DSS": {
+    "name": "DSS",
+    "airports": [
+     "DSS"
     ]
    },
    "DXB": {
@@ -1433,16 +1565,40 @@
      "DBV"
     ]
    },
+   "DYU": {
+    "name": "Dushanbe",
+    "airports": [
+     "DYU"
+    ]
+   },
    "DUS": {
     "name": "Dusseldorf",
     "airports": [
      "DUS"
     ]
    },
+   "EBB": {
+    "name": "EBB",
+    "airports": [
+     "EBB"
+    ]
+   },
+   "EBL": {
+    "name": "EBL",
+    "airports": [
+     "EBL"
+    ]
+   },
    "EDI": {
     "name": "Edinburgh",
     "airports": [
      "EDI"
+    ]
+   },
+   "EWR": {
+    "name": "EWR",
+    "airports": [
+     "EWR"
     ]
    },
    "FRA": {
@@ -1463,16 +1619,28 @@
      "GVA"
     ]
    },
-   "GZT": {
-    "name": "GZT",
+   "GOT": {
+    "name": "Gothenburg Landvetter",
     "airports": [
-     "GZT"
+     "GOT"
+    ]
+   },
+   "GRU": {
+    "name": "GRU",
+    "airports": [
+     "GRU"
     ]
    },
    "HAM": {
     "name": "Hamburg",
     "airports": [
      "HAM"
+    ]
+   },
+   "HAN": {
+    "name": "HAN",
+    "airports": [
+     "HAN"
     ]
    },
    "HEL": {
@@ -1487,10 +1655,40 @@
      "HER"
     ]
    },
+   "HKG": {
+    "name": "HKG",
+    "airports": [
+     "HKG"
+    ]
+   },
+   "HKT": {
+    "name": "HKT",
+    "airports": [
+     "HKT"
+    ]
+   },
+   "HND": {
+    "name": "HND",
+    "airports": [
+     "HND"
+    ]
+   },
    "HRG": {
     "name": "Hurghada",
     "airports": [
      "HRG"
+    ]
+   },
+   "IAD": {
+    "name": "IAD",
+    "airports": [
+     "IAD"
+    ]
+   },
+   "IAH": {
+    "name": "IAH",
+    "airports": [
+     "IAH"
     ]
    },
    "IAS": {
@@ -1499,10 +1697,46 @@
      "IAS"
     ]
    },
-   "ADB": {
-    "name": "Izmir",
+   "ICN": {
+    "name": "ICN",
     "airports": [
-     "ADB"
+     "ICN"
+    ]
+   },
+   "ISB": {
+    "name": "ISB",
+    "airports": [
+     "ISB"
+    ]
+   },
+   "JED": {
+    "name": "Jeddah",
+    "airports": [
+     "JED"
+    ]
+   },
+   "JNB": {
+    "name": "JNB",
+    "airports": [
+     "JNB"
+    ]
+   },
+   "JRO": {
+    "name": "JRO",
+    "airports": [
+     "JRO"
+    ]
+   },
+   "KHI": {
+    "name": "KHI",
+    "airports": [
+     "KHI"
+    ]
+   },
+   "KIX": {
+    "name": "KIX",
+    "airports": [
+     "KIX"
     ]
    },
    "CGN": {
@@ -1517,22 +1751,46 @@
      "KRK"
     ]
    },
+   "KTM": {
+    "name": "KTM",
+    "airports": [
+     "KTM"
+    ]
+   },
+   "KUL": {
+    "name": "KUL",
+    "airports": [
+     "KUL"
+    ]
+   },
    "KWI": {
     "name": "KWI",
     "airports": [
      "KWI"
     ]
    },
-   "KYA": {
-    "name": "KYA",
+   "LAX": {
+    "name": "LAX",
     "airports": [
-     "KYA"
+     "LAX"
+    ]
+   },
+   "LHE": {
+    "name": "LHE",
+    "airports": [
+     "LHE"
     ]
    },
    "LIS": {
     "name": "Lisbon",
     "airports": [
      "LIS"
+    ]
+   },
+   "LJU": {
+    "name": "Ljubljana",
+    "airports": [
+     "LJU"
     ]
    },
    "LON": {
@@ -1542,6 +1800,12 @@
      "LHR",
      "LTN",
      "STN"
+    ]
+   },
+   "LOS": {
+    "name": "LOS",
+    "airports": [
+     "LOS"
     ]
    },
    "LUX": {
@@ -1568,6 +1832,12 @@
      "AGP"
     ]
    },
+   "MLA": {
+    "name": "Malta",
+    "airports": [
+     "MLA"
+    ]
+   },
    "MAN": {
     "name": "Manchester",
     "airports": [
@@ -1586,10 +1856,58 @@
      "MRS"
     ]
    },
+   "MBA": {
+    "name": "MBA",
+    "airports": [
+     "MBA"
+    ]
+   },
+   "MED": {
+    "name": "MED",
+    "airports": [
+     "MED"
+    ]
+   },
+   "MEL": {
+    "name": "MEL",
+    "airports": [
+     "MEL"
+    ]
+   },
+   "MEX": {
+    "name": "MEX",
+    "airports": [
+     "MEX"
+    ]
+   },
+   "MIA": {
+    "name": "MIA",
+    "airports": [
+     "MIA"
+    ]
+   },
    "MIL": {
     "name": "Milano",
     "airports": [
      "MXP"
+    ]
+   },
+   "MLE": {
+    "name": "MLE",
+    "airports": [
+     "MLE"
+    ]
+   },
+   "MNL": {
+    "name": "MNL",
+    "airports": [
+     "MNL"
+    ]
+   },
+   "MRU": {
+    "name": "MRU",
+    "airports": [
+     "MRU"
     ]
    },
    "MUC": {
@@ -1598,10 +1916,28 @@
      "MUC"
     ]
    },
+   "MCT": {
+    "name": "Muscat",
+    "airports": [
+     "MCT"
+    ]
+   },
    "NAP": {
     "name": "Naples",
     "airports": [
      "NAP"
+    ]
+   },
+   "NBO": {
+    "name": "NBO",
+    "airports": [
+     "NBO"
+    ]
+   },
+   "JFK": {
+    "name": "New York",
+    "airports": [
+     "JFK"
     ]
    },
    "NCE": {
@@ -1616,10 +1952,34 @@
      "INI"
     ]
    },
+   "NQZ": {
+    "name": "NQZ",
+    "airports": [
+     "NQZ"
+    ]
+   },
+   "NRT": {
+    "name": "NRT",
+    "airports": [
+     "NRT"
+    ]
+   },
    "NUE": {
     "name": "Nuremberg",
     "airports": [
      "NUE"
+    ]
+   },
+   "ORD": {
+    "name": "ORD",
+    "airports": [
+     "ORD"
+    ]
+   },
+   "ORN": {
+    "name": "ORN",
+    "airports": [
+     "ORN"
     ]
    },
    "OSL": {
@@ -1641,6 +2001,12 @@
      "ORY"
     ]
    },
+   "PEK": {
+    "name": "PEK",
+    "airports": [
+     "PEK"
+    ]
+   },
    "OPO": {
     "name": "Porto",
     "airports": [
@@ -1659,6 +2025,12 @@
      "PRN"
     ]
    },
+   "PVG": {
+    "name": "PVG",
+    "airports": [
+     "PVG"
+    ]
+   },
    "RIX": {
     "name": "Riga",
     "airports": [
@@ -1669,6 +2041,12 @@
     "name": "Roma",
     "airports": [
      "FCO"
+    ]
+   },
+   "RUH": {
+    "name": "RUH",
+    "airports": [
+     "RUH"
     ]
    },
    "JTR": {
@@ -1683,10 +2061,52 @@
      "SJJ"
     ]
    },
+   "SVQ": {
+    "name": "Seville",
+    "airports": [
+     "SVQ"
+    ]
+   },
+   "SEZ": {
+    "name": "SEZ",
+    "airports": [
+     "SEZ"
+    ]
+   },
+   "SFO": {
+    "name": "SFO",
+    "airports": [
+     "SFO"
+    ]
+   },
+   "SGN": {
+    "name": "SGN",
+    "airports": [
+     "SGN"
+    ]
+   },
+   "SHJ": {
+    "name": "Sharjah",
+    "airports": [
+     "SHJ"
+    ]
+   },
    "SSH": {
     "name": "Sharm El Sheikh",
     "airports": [
      "SSH"
+    ]
+   },
+   "SIN": {
+    "name": "SIN",
+    "airports": [
+     "SIN"
+    ]
+   },
+   "SKD": {
+    "name": "SKD",
+    "airports": [
+     "SKD"
     ]
    },
    "SKP": {
@@ -1717,6 +2137,18 @@
     "name": "Stuttgart",
     "airports": [
      "STR"
+    ]
+   },
+   "SYD": {
+    "name": "SYD",
+    "airports": [
+     "SYD"
+    ]
+   },
+   "SZG": {
+    "name": "SZG",
+    "airports": [
+     "SZG"
     ]
    },
    "TLL": {
@@ -1755,6 +2187,24 @@
      "TIA"
     ]
    },
+   "TIV": {
+    "name": "Tivat",
+    "airports": [
+     "TIV"
+    ]
+   },
+   "TLS": {
+    "name": "TLS",
+    "airports": [
+     "TLS"
+    ]
+   },
+   "TPE": {
+    "name": "TPE",
+    "airports": [
+     "TPE"
+    ]
+   },
    "TUN": {
     "name": "TUN",
     "airports": [
@@ -1767,16 +2217,16 @@
      "TRN"
     ]
    },
-   "TZX": {
-    "name": "TZX",
-    "airports": [
-     "TZX"
-    ]
-   },
    "VLC": {
     "name": "Valencia",
     "airports": [
      "VLC"
+    ]
+   },
+   "VAR": {
+    "name": "Varna (Black Sea)",
+    "airports": [
+     "VAR"
     ]
    },
    "WAW": {
@@ -1803,16 +2253,46 @@
      "VNO"
     ]
    },
+   "XIY": {
+    "name": "XIY",
+    "airports": [
+     "XIY"
+    ]
+   },
    "EVN": {
     "name": "Yerevan",
     "airports": [
      "EVN"
     ]
    },
+   "YUL": {
+    "name": "YUL",
+    "airports": [
+     "YUL"
+    ]
+   },
+   "YVR": {
+    "name": "YVR",
+    "airports": [
+     "YVR"
+    ]
+   },
+   "YYZ": {
+    "name": "YYZ",
+    "airports": [
+     "YYZ"
+    ]
+   },
    "ZAG": {
     "name": "ZAG",
     "airports": [
      "ZAG"
+    ]
+   },
+   "ZNZ": {
+    "name": "ZNZ",
+    "airports": [
+     "ZNZ"
     ]
    },
    "ZRH": {

@@ -61,13 +61,93 @@ ALIASES = {
 
 # Țări ca destinații: aeroporturile lor (cu zboruri din Chișinău, Iași, București sau Istanbul)
 COUNTRIES = {
-    "TR": ("🇹🇷 Turcia", "Turcia", ["IST", "SAW", "AYT", "ADB", "BJV", "DLM", "ASR", "GZT", "TZX", "KYA"]),
-    "EG": ("🇪🇬 Egipt", "Egipt", ["HRG", "SSH", "LXR", "CAI"]),
-    "GR": ("🇬🇷 Grecia", "Grecia", ["ATH", "HER", "RHO", "CFU", "SKG", "ZTH", "JMK", "JTR", "CHQ"]),
-    "IT": ("🇮🇹 Italia", "Italia", ["FCO", "MXP", "BGY", "VCE", "NAP", "BLQ", "PMO", "CTA", "TRN", "BRI", "CIA"]),
-    "ES": ("🇪🇸 Spania", "Spania", ["BCN", "MAD", "AGP", "ALC", "PMI", "VLC", "TFS", "LPA"]),
+    "TH": ("🇹🇭 Thailanda", "Thailanda", ["BKK", "HKT"]),
+    "VN": ("🇻🇳 Vietnam", "Vietnam", ["HAN", "SGN"]),
+    "ID": ("🇮🇩 Indonezia", "Indonezia", ["CGK", "DPS"]),
+    "MY": ("🇲🇾 Malaezia", "Malaezia", ["KUL"]),
+    "SG": ("🇸🇬 Singapore", "Singapore", ["SIN"]),
+    "PH": ("🇵🇭 Filipine", "Filipine", ["MNL"]),
+    "JP": ("🇯🇵 Japonia", "Japonia", ["NRT", "HND", "KIX"]),
+    "KR": ("🇰🇷 Coreea de Sud", "Coreea de Sud", ["ICN"]),
+    "CN": ("🇨🇳 China", "China", ["PEK", "PVG", "CAN", "XIY"]),
+    "HK": ("🇭🇰 Hong Kong", "Hong Kong", ["HKG"]),
+    "TW": ("🇹🇼 Taiwan", "Taiwan", ["TPE"]),
+    "IN": ("🇮🇳 India", "India", ["DEL", "BOM"]),
+    "PK": ("🇵🇰 Pakistan", "Pakistan", ["KHI", "LHE", "ISB"]),
+    "BD": ("🇧🇩 Bangladesh", "Bangladesh", ["DAC"]),
+    "LK": ("🇱🇰 Sri Lanka", "Sri Lanka", ["CMB"]),
+    "NP": ("🇳🇵 Nepal", "Nepal", ["KTM"]),
+    "MV": ("🇲🇻 Maldive", "Maldive", ["MLE"]),
+    "AE": ("🇦🇪 Emiratele Arabe Unite", "Emiratele Arabe Unite", ["DXB", "AUH", "SHJ"]),
+    "QA": ("🇶🇦 Qatar", "Qatar", ["DOH"]),
+    "OM": ("🇴🇲 Oman", "Oman", ["MCT"]),
+    "SA": ("🇸🇦 Arabia Saudită", "Arabia Saudită", ["RUH", "JED", "DMM", "MED"]),
+    "KW": ("🇰🇼 Kuweit", "Kuweit", ["KWI"]),
+    "BH": ("🇧🇭 Bahrain", "Bahrain", ["BAH"]),
+    "JO": ("🇯🇴 Iordania", "Iordania", ["AMM"]),
+    "LB": ("🇱🇧 Liban", "Liban", ["BEY"]),
+    "IQ": ("🇮🇶 Irak", "Irak", ["BGW", "EBL"]),
+    "EG": ("🇪🇬 Egipt", "Egipt", ["CAI", "HRG", "SSH"]),
+    "TN": ("🇹🇳 Tunisia", "Tunisia", ["TUN"]),
+    "DZ": ("🇩🇿 Algeria", "Algeria", ["ALG", "ORN"]),
+    "MA": ("🇲🇦 Maroc", "Maroc", ["CMN", "RAK"]),
+    "ET": ("🇪🇹 Etiopia", "Etiopia", ["ADD"]),
+    "KE": ("🇰🇪 Kenya", "Kenya", ["NBO", "MBA"]),
+    "TZ": ("🇹🇿 Tanzania", "Tanzania", ["DAR", "JRO", "ZNZ"]),
+    "UG": ("🇺🇬 Uganda", "Uganda", ["EBB"]),
+    "NG": ("🇳🇬 Nigeria", "Nigeria", ["LOS", "ABV"]),
+    "GH": ("🇬🇭 Ghana", "Ghana", ["ACC"]),
+    "SN": ("🇸🇳 Senegal", "Senegal", ["DSS"]),
+    "ZA": ("🇿🇦 Africa de Sud", "Africa de Sud", ["JNB", "CPT"]),
+    "MU": ("🇲🇺 Mauritius", "Mauritius", ["MRU"]),
+    "SC": ("🇸🇨 Seychelles", "Seychelles", ["SEZ"]),
+    "AZ": ("🇦🇿 Azerbaidjan", "Azerbaidjan", ["GYD"]),
+    "GE": ("🇬🇪 Georgia", "Georgia", ["TBS", "BUS"]),
+    "AM": ("🇦🇲 Armenia", "Armenia", ["EVN"]),
+    "KZ": ("🇰🇿 Kazahstan", "Kazahstan", ["ALA", "NQZ"]),
+    "UZ": ("🇺🇿 Uzbekistan", "Uzbekistan", ["TAS", "SKD"]),
+    "TM": ("🇹🇲 Turkmenistan", "Turkmenistan", ["ASB"]),
+    "TJ": ("🇹🇯 Tadjikistan", "Tadjikistan", ["DYU"]),
+    "GR": ("🇬🇷 Grecia", "Grecia", ["ATH", "SKG", "HER", "JTR"]),
+    "BG": ("🇧🇬 Bulgaria", "Bulgaria", ["SOF", "VAR"]),
+    "RO": ("🇷🇴 Romania", "Romania", ["OTP", "CLJ", "TSR", "CND"]),
+    "RS": ("🇷🇸 Serbia", "Serbia", ["BEG", "INI"]),
+    "HR": ("🇭🇷 Croatia", "Croatia", ["ZAG", "SPU", "DBV"]),
+    "BA": ("🇧🇦 Bosnia", "Bosnia", ["SJJ"]),
+    "MK": ("🇲🇰 Macedonia de Nord", "Macedonia de Nord", ["SKP"]),
+    "AL": ("🇦🇱 Albania", "Albania", ["TIA"]),
+    "ME": ("🇲🇪 Muntenegru", "Muntenegru", ["TIV"]),
+    "XK": ("🇽🇰 Kosovo", "Kosovo", ["PRN"]),
+    "SI": ("🇸🇮 Slovenia", "Slovenia", ["LJU"]),
+    "HU": ("🇭🇺 Ungaria", "Ungaria", ["BUD"]),
+    "CZ": ("🇨🇿 Cehia", "Cehia", ["PRG"]),
+    "PL": ("🇵🇱 Polonia", "Polonia", ["WAW", "KRK", "GDN"]),
     "DE": ("🇩🇪 Germania", "Germania", ["BER", "FRA", "MUC", "DUS", "CGN", "HAM", "STR", "NUE"]),
-    "AE": ("🇦🇪 Emiratele Arabe Unite", "Emiratele", ["DXB", "DWC", "AUH"]),
+    "AT": ("🇦🇹 Austria", "Austria", ["VIE", "SZG"]),
+    "CH": ("🇨🇭 Elveția", "Elveția", ["ZRH", "GVA", "BSL"]),
+    "IT": ("🇮🇹 Italia", "Italia", ["FCO", "MXP", "VCE", "NAP", "BLQ", "PMO", "CTA", "TRN", "BRI"]),
+    "ES": ("🇪🇸 Spania", "Spania", ["MAD", "BCN", "AGP", "VLC", "SVQ", "BIO"]),
+    "PT": ("🇵🇹 Portugalia", "Portugalia", ["LIS", "OPO"]),
+    "FR": ("🇫🇷 Franța", "Franța", ["CDG", "ORY", "NCE", "LYS", "MRS", "BOD", "TLS"]),
+    "BE": ("🇧🇪 Belgia", "Belgia", ["BRU"]),
+    "NL": ("🇳🇱 Olanda", "Olanda", ["AMS"]),
+    "LU": ("🇱🇺 Luxemburg", "Luxemburg", ["LUX"]),
+    "GB": ("🇬🇧 Regatul Unit", "Regatul Unit", ["LHR", "LGW", "STN", "LTN", "MAN", "EDI", "BHX"]),
+    "IE": ("🇮🇪 Irlanda", "Irlanda", ["DUB"]),
+    "DK": ("🇩🇰 Danemarca", "Danemarca", ["CPH"]),
+    "SE": ("🇸🇪 Suedia", "Suedia", ["ARN", "GOT"]),
+    "NO": ("🇳🇴 Norvegia", "Norvegia", ["OSL"]),
+    "FI": ("🇫🇮 Finlanda", "Finlanda", ["HEL"]),
+    "EE": ("🇪🇪 Estonia", "Estonia", ["TLL"]),
+    "LV": ("🇱🇻 Letonia", "Letonia", ["RIX"]),
+    "LT": ("🇱🇹 Lituania", "Lituania", ["VNO"]),
+    "MT": ("🇲🇹 Malta", "Malta", ["MLA"]),
+    "US": ("🇺🇸 Statele Unite", "Statele Unite", ["JFK", "EWR", "IAD", "ORD", "ATL", "LAX", "MIA", "BOS", "SFO", "DFW", "IAH"]),
+    "CA": ("🇨🇦 Canada", "Canada", ["YYZ", "YUL", "YVR"]),
+    "MX": ("🇲🇽 Mexic", "Mexic", ["MEX", "CUN"]),
+    "BR": ("🇧🇷 Brazilia", "Brazilia", ["GRU"]),
+    "VE": ("🇻🇪 Venezuela", "Venezuela", ["CCS"]),
+    "AU": ("🇦🇺 Australia", "Australia", ["SYD", "MEL"]),
 }
 
 
@@ -376,11 +456,7 @@ KIWI_DEFAULT = [d.strip() for d in st.KIWI_DESTINATIONS.split(",") if d.strip()]
 
 
 KIWI_IST_CANDIDATES = [a.strip() for a in (os.environ.get("KIWI_IST_DESTINATIONS") or (
-    "ATH,SKG,HER,RHO,CFU,JMK,JTR,SOF,BOJ,OTP,CLJ,TSR,IAS,KIV,BEG,INI,SKP,TIA,PRN,SJJ,SPU,ZAG,DBV,"
-    "VIE,BUD,PRG,WAW,KRK,GDN,BTS,VNO,RIX,TLL,HEL,ARN,CPH,OSL,BRU,AMS,LUX,FRA,MUC,BER,DUS,CGN,HAM,STR,NUE,"
-    "ZRH,GVA,BSL,MXP,BGY,FCO,VCE,NAP,BLQ,PMO,CTA,TRN,BRI,CIA,MAD,BCN,AGP,ALC,PMI,VLC,LIS,OPO,FAO,"
-    "CDG,ORY,BVA,LHR,LGW,STN,LTN,DUB,EDI,MAN,DXB,DWC,AUH,DOH,KWI,BAH,AMM,BEY,TLV,CAI,HRG,SSH,LXR,"
-    "EVN,TBS,GYD,ALA,TAS,BAK,NJF,KUT,ADB,AYT,BJV,DLM,ASR,GZT,TZX,KYA,ESB,MRS,NCE,LYS,ALG,CMN,RAK,TUN"
+    "ABV,ACC,ADD,AGP,ALA,ALG,AMM,AMS,ARN,ASB,ATH,ATL,AUH,BAH,BCN,BEG,BER,BEY,BGW,BHX,BIO,BKK,BLQ,BOD,BOM,BOS,BRI,BRU,BSL,BUD,BUS,CAI,CAN,CCS,CDG,CGK,CGN,CLJ,CMB,CMN,CND,CPH,CPT,CTA,CUN,DAC,DAR,DBV,DEL,DFW,DMM,DOH,DPS,DSS,DUB,DUS,DXB,DYU,EBB,EBL,EDI,EVN,EWR,FCO,FRA,GDN,GOT,GRU,GVA,GYD,HAM,HAN,HEL,HER,HKG,HKT,HND,HRG,IAD,IAH,ICN,INI,ISB,JED,JFK,JNB,JRO,JTR,KHI,KIX,KRK,KTM,KUL,KWI,LAX,LGW,LHE,LHR,LIS,LJU,LOS,LTN,LUX,LYS,MAD,MAN,MBA,MCT,MED,MEL,MEX,MIA,MLA,MLE,MNL,MRS,MRU,MUC,MXP,NAP,NBO,NCE,NQZ,NRT,NUE,OPO,ORD,ORN,ORY,OSL,OTP,PEK,PMO,PRG,PRN,PVG,RAK,RIX,RUH,SEZ,SFO,SGN,SHJ,SIN,SJJ,SKD,SKG,SKP,SOF,SPU,SSH,STN,STR,SVQ,SYD,SZG,TAS,TBS,TIA,TIV,TLL,TLS,TPE,TRN,TSR,TUN,VAR,VCE,VIE,VLC,VNO,WAW,XIY,YUL,YVR,YYZ,ZAG,ZNZ,ZRH"
 )).split(",") if a.strip()]
 
 
@@ -553,9 +629,8 @@ def menu_destinations(catalog: dict, origin: str, page: int, token: str) -> tupl
     keyboard = [[button(info["name"][:20], f"c:{origin}:{place}:{token}") for place, info in chunk[i:i + 3]]
                 for i in range(0, len(chunk), 3)]
     if page == 0:
-        countries = [button(flag, f"c:{origin}:@{code}:{token}") for code, (flag, _, _) in COUNTRIES.items()]
-        keyboard = [[button("🌍 Oriunde (cele mai ieftine)", f"c:{origin}:{ANYWHERE}:{token}")]] + \
-            [countries[i:i + 3] for i in range(0, len(countries), 3)] + keyboard
+        keyboard = [[button("🌍 Oriunde (cele mai ieftine)", f"c:{origin}:{ANYWHERE}:{token}")],
+                    [button("🗺 Țări", f"k:{origin}:0:{token}")]] + keyboard
     nav = []
     if page > 0:
         nav.append(button("◀️ Înapoi", f"p:{origin}:{page - 1}:{token}"))
@@ -579,6 +654,31 @@ def place_name(catalog: dict, origin: str, place: str) -> str:
 PAX_OPTIONS = [("1 adult", 1, 0), ("2 adulți", 2, 0), ("3 adulți", 3, 0), ("4 adulți", 4, 0),
                ("1 adult + 1 copil", 1, 1), ("2 adulți + 1 copil", 2, 1), ("2 adulți + 2 copii", 2, 2),
                ("2 adulți + 3 copii", 2, 3)]
+
+
+def direct_airports(catalog: dict, origin: str) -> set[str]:
+    return {a for info in catalog.get(origin, {}).values() for a in info["airports"]}
+
+
+def menu_countries(catalog: dict, origin: str, page: int, token: str) -> tuple[str, list]:
+    """Țările cu cel puțin un zbor direct din orașul ales."""
+    reachable = direct_airports(catalog, origin)
+    countries = [(code, c) for code, c in COUNTRIES.items() if reachable & set(c[2])]
+    per_page = 15
+    pages = max(1, -(-len(countries) // per_page))
+    page = min(max(page, 0), pages - 1)
+    chunk = countries[page * per_page:(page + 1) * per_page]
+    list_buttons = [button(c[0], f"c:{origin}:@{code}:{token}") for code, c in chunk]
+    keyboard = [list_buttons[i:i + 3] for i in range(0, len(list_buttons), 3)]
+    nav = [button("◀️ Înapoi", f"p:{origin}:0:{token}")]
+    if page > 0:
+        nav.append(button("◀️ Pagina anterioară", f"k:{origin}:{page - 1}:{token}"))
+    if page < pages - 1:
+        nav.append(button("Pagina următoare ▶️", f"k:{origin}:{page + 1}:{token}"))
+    keyboard.append(nav)
+    text = (window_header(token) + f"🗺 <b>Țări din {st.ORIGIN_NAMES.get(origin, origin)}</b>\n"
+            f"{len(countries)} țări cu zboruri directe · pagina {page + 1}/{pages}")
+    return text, keyboard
 
 
 def menu_days(catalog: dict, origin: str, place: str, token: str) -> tuple[str, list]:
@@ -711,6 +811,8 @@ class Session:
             self.edit(msg, *menu_destinations(self.catalog, parts[1], 0, token))
         elif parts[0] == "p":
             self.edit(msg, *menu_destinations(self.catalog, parts[1], int(parts[2]), token))
+        elif parts[0] == "k":
+            self.edit(msg, *menu_countries(self.catalog, parts[1], int(parts[2]), token))
         elif parts[0] == "c":
             self.edit(msg, *menu_days(self.catalog, parts[1], parts[2], token))
         elif parts[0] == "x":

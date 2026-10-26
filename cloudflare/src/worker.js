@@ -10,8 +10,93 @@
 const ORIGINS = ["RMO", "IAS", "OTP", "IST"];
 const ORIGIN_NAMES = { RMO: "Chișinău", IAS: "Iași", OTP: "București", IST: "Istanbul" };
 const COUNTRIES = {
-  TR: ["🇹🇷 Turcia"], EG: ["🇪🇬 Egipt"], GR: ["🇬🇷 Grecia"], IT: ["🇮🇹 Italia"], ES: ["🇪🇸 Spania"],
-  DE: ["🇩🇪 Germania"], AE: ["🇦🇪 Emiratele Arabe Unite"],
+  TH: ["🇹🇭 Thailanda", ["BKK", "HKT"]],
+  VN: ["🇻🇳 Vietnam", ["HAN", "SGN"]],
+  ID: ["🇮🇩 Indonezia", ["CGK", "DPS"]],
+  MY: ["🇲🇾 Malaezia", ["KUL"]],
+  SG: ["🇸🇬 Singapore", ["SIN"]],
+  PH: ["🇵🇭 Filipine", ["MNL"]],
+  JP: ["🇯🇵 Japonia", ["NRT", "HND", "KIX"]],
+  KR: ["🇰🇷 Coreea de Sud", ["ICN"]],
+  CN: ["🇨🇳 China", ["PEK", "PVG", "CAN", "XIY"]],
+  HK: ["🇭🇰 Hong Kong", ["HKG"]],
+  TW: ["🇹🇼 Taiwan", ["TPE"]],
+  IN: ["🇮🇳 India", ["DEL", "BOM"]],
+  PK: ["🇵🇰 Pakistan", ["KHI", "LHE", "ISB"]],
+  BD: ["🇧🇩 Bangladesh", ["DAC"]],
+  LK: ["🇱🇰 Sri Lanka", ["CMB"]],
+  NP: ["🇳🇵 Nepal", ["KTM"]],
+  MV: ["🇲🇻 Maldive", ["MLE"]],
+  AE: ["🇦🇪 Emiratele Arabe Unite", ["DXB", "AUH", "SHJ"]],
+  QA: ["🇶🇦 Qatar", ["DOH"]],
+  OM: ["🇴🇲 Oman", ["MCT"]],
+  SA: ["🇸🇦 Arabia Saudită", ["RUH", "JED", "DMM", "MED"]],
+  KW: ["🇰🇼 Kuweit", ["KWI"]],
+  BH: ["🇧🇭 Bahrain", ["BAH"]],
+  JO: ["🇯🇴 Iordania", ["AMM"]],
+  LB: ["🇱🇧 Liban", ["BEY"]],
+  IQ: ["🇮🇶 Irak", ["BGW", "EBL"]],
+  EG: ["🇪🇬 Egipt", ["CAI", "HRG", "SSH"]],
+  TN: ["🇹🇳 Tunisia", ["TUN"]],
+  DZ: ["🇩🇿 Algeria", ["ALG", "ORN"]],
+  MA: ["🇲🇦 Maroc", ["CMN", "RAK"]],
+  ET: ["🇪🇹 Etiopia", ["ADD"]],
+  KE: ["🇰🇪 Kenya", ["NBO", "MBA"]],
+  TZ: ["🇹🇿 Tanzania", ["DAR", "JRO", "ZNZ"]],
+  UG: ["🇺🇬 Uganda", ["EBB"]],
+  NG: ["🇳🇬 Nigeria", ["LOS", "ABV"]],
+  GH: ["🇬🇭 Ghana", ["ACC"]],
+  SN: ["🇸🇳 Senegal", ["DSS"]],
+  ZA: ["🇿🇦 Africa de Sud", ["JNB", "CPT"]],
+  MU: ["🇲🇺 Mauritius", ["MRU"]],
+  SC: ["🇸🇨 Seychelles", ["SEZ"]],
+  AZ: ["🇦🇿 Azerbaidjan", ["GYD"]],
+  GE: ["🇬🇪 Georgia", ["TBS", "BUS"]],
+  AM: ["🇦🇲 Armenia", ["EVN"]],
+  KZ: ["🇰🇿 Kazahstan", ["ALA", "NQZ"]],
+  UZ: ["🇺🇿 Uzbekistan", ["TAS", "SKD"]],
+  TM: ["🇹🇲 Turkmenistan", ["ASB"]],
+  TJ: ["🇹🇯 Tadjikistan", ["DYU"]],
+  GR: ["🇬🇷 Grecia", ["ATH", "SKG", "HER", "JTR"]],
+  BG: ["🇧🇬 Bulgaria", ["SOF", "VAR"]],
+  RO: ["🇷🇴 Romania", ["OTP", "CLJ", "TSR", "CND"]],
+  RS: ["🇷🇸 Serbia", ["BEG", "INI"]],
+  HR: ["🇭🇷 Croatia", ["ZAG", "SPU", "DBV"]],
+  BA: ["🇧🇦 Bosnia", ["SJJ"]],
+  MK: ["🇲🇰 Macedonia de Nord", ["SKP"]],
+  AL: ["🇦🇱 Albania", ["TIA"]],
+  ME: ["🇲🇪 Muntenegru", ["TIV"]],
+  XK: ["🇽🇰 Kosovo", ["PRN"]],
+  SI: ["🇸🇮 Slovenia", ["LJU"]],
+  HU: ["🇭🇺 Ungaria", ["BUD"]],
+  CZ: ["🇨🇿 Cehia", ["PRG"]],
+  PL: ["🇵🇱 Polonia", ["WAW", "KRK", "GDN"]],
+  DE: ["🇩🇪 Germania", ["BER", "FRA", "MUC", "DUS", "CGN", "HAM", "STR", "NUE"]],
+  AT: ["🇦🇹 Austria", ["VIE", "SZG"]],
+  CH: ["🇨🇭 Elveția", ["ZRH", "GVA", "BSL"]],
+  IT: ["🇮🇹 Italia", ["FCO", "MXP", "VCE", "NAP", "BLQ", "PMO", "CTA", "TRN", "BRI"]],
+  ES: ["🇪🇸 Spania", ["MAD", "BCN", "AGP", "VLC", "SVQ", "BIO"]],
+  PT: ["🇵🇹 Portugalia", ["LIS", "OPO"]],
+  FR: ["🇫🇷 Franța", ["CDG", "ORY", "NCE", "LYS", "MRS", "BOD", "TLS"]],
+  BE: ["🇧🇪 Belgia", ["BRU"]],
+  NL: ["🇳🇱 Olanda", ["AMS"]],
+  LU: ["🇱🇺 Luxemburg", ["LUX"]],
+  GB: ["🇬🇧 Regatul Unit", ["LHR", "LGW", "STN", "LTN", "MAN", "EDI", "BHX"]],
+  IE: ["🇮🇪 Irlanda", ["DUB"]],
+  DK: ["🇩🇰 Danemarca", ["CPH"]],
+  SE: ["🇸🇪 Suedia", ["ARN", "GOT"]],
+  NO: ["🇳🇴 Norvegia", ["OSL"]],
+  FI: ["🇫🇮 Finlanda", ["HEL"]],
+  EE: ["🇪🇪 Estonia", ["TLL"]],
+  LV: ["🇱🇻 Letonia", ["RIX"]],
+  LT: ["🇱🇹 Lituania", ["VNO"]],
+  MT: ["🇲🇹 Malta", ["MLA"]],
+  US: ["🇺🇸 Statele Unite", ["JFK", "EWR", "IAD", "ORD", "ATL", "LAX", "MIA", "BOS", "SFO", "DFW", "IAH"]],
+  CA: ["🇨🇦 Canada", ["YYZ", "YUL", "YVR"]],
+  MX: ["🇲🇽 Mexic", ["MEX", "CUN"]],
+  BR: ["🇧🇷 Brazilia", ["GRU"]],
+  VE: ["🇻🇪 Venezuela", ["CCS"]],
+  AU: ["🇦🇺 Australia", ["SYD", "MEL"]],
 };
 const DAYS_AHEAD = 180; // perioada implicită pentru mesajele text
 const MONTHS_AHEAD = 12;
@@ -139,8 +224,8 @@ function menuDestinations(catalog, origin, page, token) {
   const chunk = cities.slice(page * CITIES_PER_PAGE, (page + 1) * CITIES_PER_PAGE);
   const keyboard = rows(chunk.map(([place, info]) => button(info.name.slice(0, 20), `c:${origin}:${place}:${token}`)), 3);
   if (page === 0) {
-    const countries = Object.entries(COUNTRIES).map(([code, [flag]]) => button(flag, `c:${origin}:@${code}:${token}`));
-    keyboard.unshift(...rows(countries, 3), [button("🌍 Oriunde (cele mai ieftine)", `c:${origin}:${ANYWHERE}:${token}`)]);
+    keyboard.unshift([button("🌍 Oriunde (cele mai ieftine)", `c:${origin}:${ANYWHERE}:${token}`)],
+      [button("🗺 Țări", `k:${origin}:0:${token}`)]);
   }
   const nav = [];
   if (page > 0) nav.push(button("◀️ Înapoi", `p:${origin}:${page - 1}:${token}`));
@@ -155,6 +240,22 @@ function placeName(catalog, origin, place) {
   if (place === ANYWHERE) return "🌍 Oriunde";
   if (place.startsWith("@")) return COUNTRIES[place.slice(1)][0];
   return catalog[origin]?.[place]?.name || place;
+}
+
+function menuCountries(catalog, origin, page, token) {
+  const reachable = new Set(Object.values(catalog[origin] || {}).flatMap((info) => info.airports));
+  const countries = Object.entries(COUNTRIES).filter(([, [, airports]]) => airports.some((a) => reachable.has(a)));
+  const perPage = 15;
+  const pages = Math.max(1, Math.ceil(countries.length / perPage));
+  page = Math.min(Math.max(page, 0), pages - 1);
+  const chunk = countries.slice(page * perPage, (page + 1) * perPage);
+  const keyboard = rows(chunk.map(([code, [label]]) => button(label, `c:${origin}:@${code}:${token}`)), 3);
+  const nav = [button("◀️ Înapoi", `p:${origin}:0:${token}`)];
+  if (page > 0) nav.push(button("◀️ Pagina anterioară", `k:${origin}:${page - 1}:${token}`));
+  if (page < pages - 1) nav.push(button("Pagina următoare ▶️", `k:${origin}:${page + 1}:${token}`));
+  keyboard.push(nav);
+  return [windowHeader(token) + `🗺 <b>Țări din ${originName(origin)}</b>\n` +
+    `${countries.length} țări cu zboruri directe · pagina ${page + 1}/${pages}`, keyboard];
 }
 
 function menuDays(catalog, origin, place, token) {
@@ -249,6 +350,7 @@ async function onCallback(env, cb) {
   const catalog = await loadCatalog(env);
   if (parts[0] === "o") return edit(env, msg, ...menuDestinations(catalog, parts[1], 0, token));
   if (parts[0] === "p") return edit(env, msg, ...menuDestinations(catalog, parts[1], +parts[2], token));
+  if (parts[0] === "k") return edit(env, msg, ...menuCountries(catalog, parts[1], +parts[2], token));
   if (parts[0] === "c") return edit(env, msg, ...menuDays(catalog, parts[1], parts[2], token));
   if (parts[0] === "x") {
     return edit(env, msg, ...menuPassengers(catalog, parts[1], parts[2], +parts[3], +parts[4], parts[5] === "1", token));
