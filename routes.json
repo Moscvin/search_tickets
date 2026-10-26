@@ -1,5 +1,5 @@
 {
- "date": "2026-10-25",
+ "date": "2026-10-26",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -466,6 +466,12 @@
     "name": "Eindhoven",
     "airports": [
      "EIN"
+    ]
+   },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
     ]
    },
    "IST": {
