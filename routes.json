@@ -1,5 +1,5 @@
 {
- "date": "2026-10-16",
+ "date": "2026-10-26",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -454,12 +454,6 @@
     "name": "Dortmund",
     "airports": [
      "DTM"
-    ]
-   },
-   "DXB": {
-    "name": "Dubai",
-    "airports": [
-     "DXB"
     ]
    },
    "DUB": {
@@ -1231,6 +1225,594 @@
     "name": "Zaragoza",
     "airports": [
      "ZAZ"
+    ]
+   },
+   "ZRH": {
+    "name": "Zürich",
+    "airports": [
+     "ZRH"
+    ]
+   }
+  },
+  "IST": {
+   "AUH": {
+    "name": "Abu Dhabi",
+    "airports": [
+     "AUH"
+    ]
+   },
+   "ALG": {
+    "name": "ALG",
+    "airports": [
+     "ALG"
+    ]
+   },
+   "ALA": {
+    "name": "Almaty",
+    "airports": [
+     "ALA"
+    ]
+   },
+   "AMM": {
+    "name": "Amman",
+    "airports": [
+     "AMM"
+    ]
+   },
+   "AMS": {
+    "name": "Amsterdam",
+    "airports": [
+     "AMS"
+    ]
+   },
+   "ESB": {
+    "name": "Ankara",
+    "airports": [
+     "ESB"
+    ]
+   },
+   "AYT": {
+    "name": "Antalya",
+    "airports": [
+     "AYT"
+    ]
+   },
+   "ASR": {
+    "name": "ASR",
+    "airports": [
+     "ASR"
+    ]
+   },
+   "ATH": {
+    "name": "Atena",
+    "airports": [
+     "ATH"
+    ]
+   },
+   "BAH": {
+    "name": "BAH",
+    "airports": [
+     "BAH"
+    ]
+   },
+   "GYD": {
+    "name": "Baku",
+    "airports": [
+     "GYD"
+    ]
+   },
+   "BCN": {
+    "name": "Barcelona",
+    "airports": [
+     "BCN"
+    ]
+   },
+   "BRI": {
+    "name": "Bari",
+    "airports": [
+     "BRI"
+    ]
+   },
+   "EAP": {
+    "name": "Basel",
+    "airports": [
+     "BSL"
+    ]
+   },
+   "BEG": {
+    "name": "Belgrade",
+    "airports": [
+     "BEG"
+    ]
+   },
+   "BER": {
+    "name": "Berlin Brandenburg",
+    "airports": [
+     "BER"
+    ]
+   },
+   "BEY": {
+    "name": "BEY",
+    "airports": [
+     "BEY"
+    ]
+   },
+   "BJV": {
+    "name": "Bodrum",
+    "airports": [
+     "BJV"
+    ]
+   },
+   "BLQ": {
+    "name": "Bologna",
+    "airports": [
+     "BLQ"
+    ]
+   },
+   "BRU": {
+    "name": "Bruxelles",
+    "airports": [
+     "BRU"
+    ]
+   },
+   "BUH": {
+    "name": "București",
+    "airports": [
+     "OTP"
+    ]
+   },
+   "BUD": {
+    "name": "Budapest",
+    "airports": [
+     "BUD"
+    ]
+   },
+   "CAI": {
+    "name": "CAI",
+    "airports": [
+     "CAI"
+    ]
+   },
+   "CTA": {
+    "name": "Catania (Sicily)",
+    "airports": [
+     "CTA"
+    ]
+   },
+   "CLJ": {
+    "name": "Cluj-Napoca",
+    "airports": [
+     "CLJ"
+    ]
+   },
+   "CMN": {
+    "name": "CMN",
+    "airports": [
+     "CMN"
+    ]
+   },
+   "CPH": {
+    "name": "Copenhagen",
+    "airports": [
+     "CPH"
+    ]
+   },
+   "DLM": {
+    "name": "Dalaman",
+    "airports": [
+     "DLM"
+    ]
+   },
+   "DEB": {
+    "name": "Debrecen",
+    "airports": [
+     "DEB"
+    ]
+   },
+   "DOH": {
+    "name": "DOH",
+    "airports": [
+     "DOH"
+    ]
+   },
+   "DXB": {
+    "name": "Dubai",
+    "airports": [
+     "DXB"
+    ]
+   },
+   "DUB": {
+    "name": "Dublin",
+    "airports": [
+     "DUB"
+    ]
+   },
+   "DBV": {
+    "name": "Dubrovnik",
+    "airports": [
+     "DBV"
+    ]
+   },
+   "DUS": {
+    "name": "Dusseldorf",
+    "airports": [
+     "DUS"
+    ]
+   },
+   "EDI": {
+    "name": "Edinburgh",
+    "airports": [
+     "EDI"
+    ]
+   },
+   "FRA": {
+    "name": "Frankfurt",
+    "airports": [
+     "FRA"
+    ]
+   },
+   "GDN": {
+    "name": "Gdansk",
+    "airports": [
+     "GDN"
+    ]
+   },
+   "GVA": {
+    "name": "Geneva",
+    "airports": [
+     "GVA"
+    ]
+   },
+   "GZT": {
+    "name": "GZT",
+    "airports": [
+     "GZT"
+    ]
+   },
+   "HAM": {
+    "name": "Hamburg",
+    "airports": [
+     "HAM"
+    ]
+   },
+   "HEL": {
+    "name": "HEL",
+    "airports": [
+     "HEL"
+    ]
+   },
+   "HER": {
+    "name": "Heraklion (Crete)",
+    "airports": [
+     "HER"
+    ]
+   },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
+    ]
+   },
+   "IAS": {
+    "name": "Iași",
+    "airports": [
+     "IAS"
+    ]
+   },
+   "ADB": {
+    "name": "Izmir",
+    "airports": [
+     "ADB"
+    ]
+   },
+   "CGN": {
+    "name": "Köln",
+    "airports": [
+     "CGN"
+    ]
+   },
+   "KRK": {
+    "name": "Kraków",
+    "airports": [
+     "KRK"
+    ]
+   },
+   "KWI": {
+    "name": "KWI",
+    "airports": [
+     "KWI"
+    ]
+   },
+   "KYA": {
+    "name": "KYA",
+    "airports": [
+     "KYA"
+    ]
+   },
+   "LIS": {
+    "name": "Lisbon",
+    "airports": [
+     "LIS"
+    ]
+   },
+   "LON": {
+    "name": "Londra",
+    "airports": [
+     "LGW",
+     "LHR",
+     "LTN",
+     "STN"
+    ]
+   },
+   "LUX": {
+    "name": "LUX",
+    "airports": [
+     "LUX"
+    ]
+   },
+   "LYS": {
+    "name": "Lyon",
+    "airports": [
+     "LYS"
+    ]
+   },
+   "MAD": {
+    "name": "Madrid",
+    "airports": [
+     "MAD"
+    ]
+   },
+   "AGP": {
+    "name": "Malaga",
+    "airports": [
+     "AGP"
+    ]
+   },
+   "MAN": {
+    "name": "Manchester",
+    "airports": [
+     "MAN"
+    ]
+   },
+   "RAK": {
+    "name": "Marrakesh",
+    "airports": [
+     "RAK"
+    ]
+   },
+   "MRS": {
+    "name": "Marseille",
+    "airports": [
+     "MRS"
+    ]
+   },
+   "MIL": {
+    "name": "Milano",
+    "airports": [
+     "MXP"
+    ]
+   },
+   "MUC": {
+    "name": "München",
+    "airports": [
+     "MUC"
+    ]
+   },
+   "NAP": {
+    "name": "Naples",
+    "airports": [
+     "NAP"
+    ]
+   },
+   "NCE": {
+    "name": "Nice",
+    "airports": [
+     "NCE"
+    ]
+   },
+   "INI": {
+    "name": "Niš",
+    "airports": [
+     "INI"
+    ]
+   },
+   "NUE": {
+    "name": "Nuremberg",
+    "airports": [
+     "NUE"
+    ]
+   },
+   "OSL": {
+    "name": "Oslo",
+    "airports": [
+     "OSL"
+    ]
+   },
+   "PMO": {
+    "name": "Palermo (Sicily)",
+    "airports": [
+     "PMO"
+    ]
+   },
+   "PAR": {
+    "name": "Paris",
+    "airports": [
+     "CDG",
+     "ORY"
+    ]
+   },
+   "OPO": {
+    "name": "Porto",
+    "airports": [
+     "OPO"
+    ]
+   },
+   "PRG": {
+    "name": "Prague",
+    "airports": [
+     "PRG"
+    ]
+   },
+   "PRN": {
+    "name": "Prishtina",
+    "airports": [
+     "PRN"
+    ]
+   },
+   "RIX": {
+    "name": "Riga",
+    "airports": [
+     "RIX"
+    ]
+   },
+   "ROM": {
+    "name": "Roma",
+    "airports": [
+     "FCO"
+    ]
+   },
+   "JTR": {
+    "name": "Santorini",
+    "airports": [
+     "JTR"
+    ]
+   },
+   "SJJ": {
+    "name": "Sarajevo",
+    "airports": [
+     "SJJ"
+    ]
+   },
+   "SSH": {
+    "name": "Sharm El Sheikh",
+    "airports": [
+     "SSH"
+    ]
+   },
+   "SKP": {
+    "name": "Skopje",
+    "airports": [
+     "SKP"
+    ]
+   },
+   "SOF": {
+    "name": "Sofia",
+    "airports": [
+     "SOF"
+    ]
+   },
+   "SPU": {
+    "name": "Split",
+    "airports": [
+     "SPU"
+    ]
+   },
+   "STO": {
+    "name": "Stockholm",
+    "airports": [
+     "ARN"
+    ]
+   },
+   "STR": {
+    "name": "Stuttgart",
+    "airports": [
+     "STR"
+    ]
+   },
+   "TLL": {
+    "name": "Tallinn",
+    "airports": [
+     "TLL"
+    ]
+   },
+   "TAS": {
+    "name": "Tashkent",
+    "airports": [
+     "TAS"
+    ]
+   },
+   "TBS": {
+    "name": "Tbilisi",
+    "airports": [
+     "TBS"
+    ]
+   },
+   "SKG": {
+    "name": "Thessaloniki",
+    "airports": [
+     "SKG"
+    ]
+   },
+   "TSR": {
+    "name": "Timișoara",
+    "airports": [
+     "TSR"
+    ]
+   },
+   "TIA": {
+    "name": "Tirana",
+    "airports": [
+     "TIA"
+    ]
+   },
+   "TUN": {
+    "name": "TUN",
+    "airports": [
+     "TUN"
+    ]
+   },
+   "TRN": {
+    "name": "Turin",
+    "airports": [
+     "TRN"
+    ]
+   },
+   "TZX": {
+    "name": "TZX",
+    "airports": [
+     "TZX"
+    ]
+   },
+   "VLC": {
+    "name": "Valencia",
+    "airports": [
+     "VLC"
+    ]
+   },
+   "WAW": {
+    "name": "Varșovia",
+    "airports": [
+     "WAW"
+    ]
+   },
+   "VCE": {
+    "name": "Veneția",
+    "airports": [
+     "VCE"
+    ]
+   },
+   "VIE": {
+    "name": "Viena",
+    "airports": [
+     "VIE"
+    ]
+   },
+   "VNO": {
+    "name": "Vilnius",
+    "airports": [
+     "VNO"
+    ]
+   },
+   "EVN": {
+    "name": "Yerevan",
+    "airports": [
+     "EVN"
+    ]
+   },
+   "ZAG": {
+    "name": "ZAG",
+    "airports": [
+     "ZAG"
     ]
    },
    "ZRH": {

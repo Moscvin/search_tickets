@@ -7,8 +7,12 @@
 //
 // Textele și datele butoanelor sunt aceleași ca în bot.py, ca să rămână compatibile.
 
-const ORIGINS = ["RMO", "IAS", "OTP"];
-const ORIGIN_NAMES = { RMO: "Chișinău", IAS: "Iași", OTP: "București" };
+const ORIGINS = ["RMO", "IAS", "OTP", "IST"];
+const ORIGIN_NAMES = { RMO: "Chișinău", IAS: "Iași", OTP: "București", IST: "Istanbul" };
+const COUNTRIES = {
+  TR: ["🇹🇷 Turcia"], EG: ["🇪🇬 Egipt"], GR: ["🇬🇷 Grecia"], IT: ["🇮🇹 Italia"], ES: ["🇪🇸 Spania"],
+  DE: ["🇩🇪 Germania"], AE: ["🇦🇪 Emiratele Arabe Unite"],
+};
 const DAYS_AHEAD = 180; // perioada implicită pentru mesajele text
 const MONTHS_AHEAD = 12;
 const CITIES_PER_PAGE = 24;
@@ -134,7 +138,10 @@ function menuDestinations(catalog, origin, page, token) {
   page = Math.min(Math.max(page, 0), pages - 1);
   const chunk = cities.slice(page * CITIES_PER_PAGE, (page + 1) * CITIES_PER_PAGE);
   const keyboard = rows(chunk.map(([place, info]) => button(info.name.slice(0, 20), `c:${origin}:${place}:${token}`)), 3);
-  if (page === 0) keyboard.unshift([button("🌍 Oriunde (cele mai ieftine)", `c:${origin}:${ANYWHERE}:${token}`)]);
+  if (page === 0) {
+    const countries = Object.entries(COUNTRIES).map(([code, [flag]]) => button(flag, `c:${origin}:@${code}:${token}`));
+    keyboard.unshift(...rows(countries, 3), [button("🌍 Oriunde (cele mai ieftine)", `c:${origin}:${ANYWHERE}:${token}`)]);
+  }
   const nav = [];
   if (page > 0) nav.push(button("◀️ Înapoi", `p:${origin}:${page - 1}:${token}`));
   nav.push(button("🏠 Alt oraș", `W:${token}`));
@@ -146,6 +153,7 @@ function menuDestinations(catalog, origin, page, token) {
 
 function placeName(catalog, origin, place) {
   if (place === ANYWHERE) return "🌍 Oriunde";
+  if (place.startsWith("@")) return COUNTRIES[place.slice(1)][0];
   return catalog[origin]?.[place]?.name || place;
 }
 

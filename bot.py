@@ -19,6 +19,7 @@ import datetime as dt
 import html
 import json
 import logging
+import os
 import re
 import sys
 import time
@@ -56,6 +57,24 @@ ALIASES = {
     "bucuresti": "bucharest", "chisinau": "chisinau", "iasi": "iasi", "cluj": "cluj-napoca",
     "dublin": "dublin", "edinburgh": "edinburgh", "stambul": "istanbul", "tel aviv": "tel aviv",
 }
+
+
+# Țări ca destinații: aeroporturile lor (cu zboruri din Chișinău, Iași, București sau Istanbul)
+COUNTRIES = {
+    "TR": ("🇹🇷 Turcia", "Turcia", ["IST", "SAW", "AYT", "ADB", "BJV", "DLM", "ASR", "GZT", "TZX", "KYA"]),
+    "EG": ("🇪🇬 Egipt", "Egipt", ["HRG", "SSH", "LXR", "CAI"]),
+    "GR": ("🇬🇷 Grecia", "Grecia", ["ATH", "HER", "RHO", "CFU", "SKG", "ZTH", "JMK", "JTR", "CHQ"]),
+    "IT": ("🇮🇹 Italia", "Italia", ["FCO", "MXP", "BGY", "VCE", "NAP", "BLQ", "PMO", "CTA", "TRN", "BRI", "CIA"]),
+    "ES": ("🇪🇸 Spania", "Spania", ["BCN", "MAD", "AGP", "ALC", "PMI", "VLC", "TFS", "LPA"]),
+    "DE": ("🇩🇪 Germania", "Germania", ["BER", "FRA", "MUC", "DUS", "CGN", "HAM", "STR", "NUE"]),
+    "AE": ("🇦🇪 Emiratele Arabe Unite", "Emiratele", ["DXB", "DWC", "AUH"]),
+}
+
+
+def country_by_name(text: str) -> str | None:
+    """„Turcia”, „egipt” → codul țării."""
+    key = plain(text)
+    return next((code for code, (_, name, _) in COUNTRIES.items() if plain(name) == key), None)
 
 
 def plain(text: str) -> str:
@@ -334,6 +353,10 @@ def answer(s, text: str) -> str:
     o = resolve_city(s, origin)
     if not o:
         return f"Nu am găsit orașul „{html.escape(origin)}”."
+    if country_by_name(dest):
+        code = country_by_name(dest)
+        return format_reply(o[0], COUNTRIES[code][0], min_days, max_days, opts,
+                            *search_route(s, o[1], COUNTRIES[code][2], min_days, max_days, start, end, opts))
     if plain(dest) in ("oriunde", "anywhere", "orice", "peste tot"):
         if len(o[1]) != 1 or o[1][0] not in MENU_ORIGINS:
             return "„Oriunde” merge din Chișinău, Iași sau București."
@@ -350,6 +373,15 @@ def answer(s, text: str) -> str:
 
 MENU_ORIGINS = list(st.ORIGINS)  # copiat înainte ca search_route să modifice st.ORIGINS
 KIWI_DEFAULT = [d.strip() for d in st.KIWI_DESTINATIONS.split(",") if d.strip()]  # idem, pentru „Oriunde”
+
+
+KIWI_IST_CANDIDATES = [a.strip() for a in (os.environ.get("KIWI_IST_DESTINATIONS") or (
+    "ATH,SKG,HER,RHO,CFU,JMK,JTR,SOF,BOJ,OTP,CLJ,TSR,IAS,KIV,BEG,INI,SKP,TIA,PRN,SJJ,SPU,ZAG,DBV,"
+    "VIE,BUD,PRG,WAW,KRK,GDN,BTS,VNO,RIX,TLL,HEL,ARN,CPH,OSL,BRU,AMS,LUX,FRA,MUC,BER,DUS,CGN,HAM,STR,NUE,"
+    "ZRH,GVA,BSL,MXP,BGY,FCO,VCE,NAP,BLQ,PMO,CTA,TRN,BRI,CIA,MAD,BCN,AGP,ALC,PMI,VLC,LIS,OPO,FAO,"
+    "CDG,ORY,BVA,LHR,LGW,STN,LTN,DUB,EDI,MAN,DXB,DWC,AUH,DOH,KWI,BAH,AMM,BEY,TLV,CAI,HRG,SSH,LXR,"
+    "EVN,TBS,GYD,ALA,TAS,BAK,NJF,KUT,ADB,AYT,BJV,DLM,ASR,GZT,TZX,KYA,ESB,MRS,NCE,LYS,ALG,CMN,RAK,TUN"
+)).split(",") if a.strip()]
 
 
 def route_catalog(s) -> dict[str, dict[str, dict]]:
@@ -415,9 +447,11 @@ def route_catalog(s) -> dict[str, dict[str, dict]]:
 
     for label, fn in (("Wizz", wizz), ("Ryanair", ryanair), ("FlyOne", flyone), ("HiSky", hisky), ("SkyUp", skyup)):
         collect(label, fn)
-    # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...): doar dacă Kiwi găsește un zbor direct
+    # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...): doar dacă Kiwi găsește un zbor direct.
+    # Din Istanbul zboară multe mai multe companii, deci lista de candidați e mai mare
     for o in MENU_ORIGINS:
-        for d in (d.strip() for d in st.KIWI_DESTINATIONS.split(",")):
+        candidates = KIWI_IST_CANDIDATES if o == "IST" else (d.strip() for d in st.KIWI_DESTINATIONS.split(","))
+        for d in candidates:
             if not d or d in found[o] or st.city_of(d) == st.city_of(o):
                 continue
             try:
@@ -519,7 +553,9 @@ def menu_destinations(catalog: dict, origin: str, page: int, token: str) -> tupl
     keyboard = [[button(info["name"][:20], f"c:{origin}:{place}:{token}") for place, info in chunk[i:i + 3]]
                 for i in range(0, len(chunk), 3)]
     if page == 0:
-        keyboard.insert(0, [button("🌍 Oriunde (cele mai ieftine)", f"c:{origin}:{ANYWHERE}:{token}")])
+        countries = [button(flag, f"c:{origin}:@{code}:{token}") for code, (flag, _, _) in COUNTRIES.items()]
+        keyboard = [[button("🌍 Oriunde (cele mai ieftine)", f"c:{origin}:{ANYWHERE}:{token}")]] + \
+            [countries[i:i + 3] for i in range(0, len(countries), 3)] + keyboard
     nav = []
     if page > 0:
         nav.append(button("◀️ Înapoi", f"p:{origin}:{page - 1}:{token}"))
@@ -533,7 +569,11 @@ def menu_destinations(catalog: dict, origin: str, page: int, token: str) -> tupl
 
 
 def place_name(catalog: dict, origin: str, place: str) -> str:
-    return "🌍 Oriunde" if place == ANYWHERE else catalog.get(origin, {}).get(place, {}).get("name", place)
+    if place == ANYWHERE:
+        return "🌍 Oriunde"
+    if place.startswith("@"):
+        return COUNTRIES[place[1:]][0]
+    return catalog.get(origin, {}).get(place, {}).get("name", place)
 
 
 PAX_OPTIONS = [("1 adult", 1, 0), ("2 adulți", 2, 0), ("3 adulți", 3, 0), ("4 adulți", 4, 0),
@@ -576,6 +616,10 @@ def search_from_menu(s, catalog: dict, origin: str, place: str, lo: int, hi: int
                      opts: Options) -> str:
     if place == ANYWHERE:
         return search_anywhere(s, catalog, origin, lo, hi, start, end, opts)
+    if place.startswith("@"):  # țară: toate aeroporturile ei
+        code = place[1:]
+        return format_reply(st.ORIGIN_NAMES.get(origin, origin), COUNTRIES[code][0], lo, hi, opts,
+                            *search_route(s, [origin], COUNTRIES[code][2], lo, hi, start, end, opts))
     info = catalog.get(origin, {}).get(place)
     if not info:
         return "Nu mai găsesc această rută. Încearcă din nou cu /start."
