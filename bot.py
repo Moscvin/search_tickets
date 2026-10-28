@@ -723,7 +723,7 @@ def menu_countries(catalog: dict, origin: str, page: int, token: str) -> tuple[s
     pages = max(1, -(-len(countries) // per_page))
     page = min(max(page, 0), pages - 1)
     chunk = countries[page * per_page:(page + 1) * per_page]
-    list_buttons = [button(c[0], f"c:{origin}:@{code}:{token}") for code, c in chunk]
+    list_buttons = [button(c[0], f"y:{origin}:{code}:{token}") for code, c in chunk]
     keyboard = [list_buttons[i:i + 3] for i in range(0, len(list_buttons), 3)]
     nav = [button("◀️ Înapoi", f"p:{origin}:0:{token}")]
     if page > 0:
@@ -733,6 +733,19 @@ def menu_countries(catalog: dict, origin: str, page: int, token: str) -> tuple[s
     keyboard.append(nav)
     text = (window_header(token) + f"🗺 <b>Țări din {st.ORIGIN_NAMES.get(origin, origin)}</b>\n"
             f"{len(countries)} țări cu zboruri directe · pagina {page + 1}/{pages}")
+    return text, keyboard
+
+
+def menu_country_cities(catalog: dict, origin: str, code: str, token: str) -> tuple[str, list]:
+    """Orașele dintr-o țară cu zbor direct din orașul de plecare; „Toată țara” caută pe toate."""
+    label, _, airports = COUNTRIES[code]
+    cities = [(place, info) for place, info in catalog.get(origin, {}).items() if info["airports"] & set(airports)]
+    keyboard = [[button("🌍 Toată țara", f"c:{origin}:@{code}:{token}")]]
+    rows_ = [button(info["name"][:20], f"c:{origin}:{place}:{token}") for place, info in cities]
+    keyboard += [rows_[i:i + 3] for i in range(0, len(rows_), 3)]
+    keyboard.append([button("◀️ Înapoi la țări", f"k:{origin}:0:{token}")])
+    text = (window_header(token) + f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → {label}</b>\n"
+            f"{len(cities)} orașe cu zboruri directe")
     return text, keyboard
 
 
@@ -869,6 +882,8 @@ class Session:
             self.edit(msg, *menu_destinations(self.catalog, parts[1], int(parts[2]), token))
         elif parts[0] == "k":
             self.edit(msg, *menu_countries(self.catalog, parts[1], int(parts[2]), token))
+        elif parts[0] == "y":
+            self.edit(msg, *menu_country_cities(self.catalog, parts[1], parts[2], token))
         elif parts[0] == "c":
             self.edit(msg, *menu_days(self.catalog, parts[1], parts[2], token))
         elif parts[0] == "x":

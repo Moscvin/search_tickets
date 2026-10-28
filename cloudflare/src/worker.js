@@ -243,6 +243,17 @@ function placeName(catalog, origin, place) {
   return catalog[origin]?.[place]?.name || place;
 }
 
+// Orașele dintr-o țară cu zbor direct din orașul de plecare; „Toată țara” caută pe toate
+function menuCountryCities(catalog, origin, code, token) {
+  const [label, airports] = COUNTRIES[code];
+  const cities = Object.entries(catalog[origin] || {}).filter(([, info]) => info.airports.some((a) => airports.includes(a)));
+  const keyboard = rows(cities.map(([place, info]) => button(info.name.slice(0, 20), `c:${origin}:${place}:${token}`)), 3);
+  keyboard.unshift([button("🌍 Toată țara", `c:${origin}:@${code}:${token}`)]);
+  keyboard.push([button("◀️ Înapoi la țări", `k:${origin}:0:${token}`)]);
+  return [windowHeader(token) + `✈️ <b>${originName(origin)} → ${label}</b>\n` +
+    `${cities.length} orașe cu zboruri directe`, keyboard];
+}
+
 function menuCountries(catalog, origin, page, token) {
   const reachable = new Set(Object.values(catalog[origin] || {}).flatMap((info) => info.airports));
   const countries = Object.entries(COUNTRIES).filter(([, [, airports]]) => airports.some((a) => reachable.has(a)));
@@ -250,7 +261,7 @@ function menuCountries(catalog, origin, page, token) {
   const pages = Math.max(1, Math.ceil(countries.length / perPage));
   page = Math.min(Math.max(page, 0), pages - 1);
   const chunk = countries.slice(page * perPage, (page + 1) * perPage);
-  const keyboard = rows(chunk.map(([code, [label]]) => button(label, `c:${origin}:@${code}:${token}`)), 3);
+  const keyboard = rows(chunk.map(([code, [label]]) => button(label, `y:${origin}:${code}:${token}`)), 3);
   const nav = [button("◀️ Înapoi", `p:${origin}:0:${token}`)];
   if (page > 0) nav.push(button("◀️ Pagina anterioară", `k:${origin}:${page - 1}:${token}`));
   if (page < pages - 1) nav.push(button("Pagina următoare ▶️", `k:${origin}:${page + 1}:${token}`));
@@ -354,6 +365,7 @@ async function onCallback(env, cb) {
   if (parts[0] === "o") return edit(env, msg, ...menuDestinations(catalog, parts[1], 0, token));
   if (parts[0] === "p") return edit(env, msg, ...menuDestinations(catalog, parts[1], +parts[2], token));
   if (parts[0] === "k") return edit(env, msg, ...menuCountries(catalog, parts[1], +parts[2], token));
+  if (parts[0] === "y") return edit(env, msg, ...menuCountryCities(catalog, parts[1], parts[2], token));
   if (parts[0] === "c") return edit(env, msg, ...menuDays(catalog, parts[1], parts[2], token));
   if (parts[0] === "x") {
     return edit(env, msg, ...menuPassengers(catalog, parts[1], parts[2], +parts[3], +parts[4], parts[5] === "1", token));
