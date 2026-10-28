@@ -386,6 +386,7 @@ async function rememberUser(env, chatId, from) {
 async function onAdminCommand(env, text) {
   const [cmd, rawUser] = text.trim().split(/\s+/);
   const username = (rawUser || "").replace(/^@/, "").toLowerCase();
+  const numericId = /^\d+$/.test(rawUser || "") ? rawUser : null; // ID-ul din notificare, pentru cei fără username
   if (cmd === "/utilizatori") {
     const lines = async (prefix) => {
       const { keys } = await env.USERS.list({ prefix });
@@ -400,8 +401,8 @@ async function onAdminCommand(env, text) {
       "\n\n⏳ <b>Cereri în așteptare</b>\n" + ((await lines("pending:")) || "(niciuna)"));
   }
   if (cmd === "/adauga" || cmd === "/sterge") {
-    if (!username) return send(env, "Scrie: <code>" + cmd + " @username</code>");
-    const chatId = await env.USERS.get("name:" + username);
+    if (!username && !numericId) return send(env, "Scrie: <code>" + cmd + " @username</code> sau <code>" + cmd + " ID</code>");
+    const chatId = numericId || (await env.USERS.get("name:" + username));
     if (!chatId) return send(env, `Nu cunosc pe @${esc(username)}. Trebuie să-i scrie botului întâi.`);
     if (cmd === "/adauga") {
       const pending = await env.USERS.get("pending:" + chatId);
@@ -409,7 +410,7 @@ async function onAdminCommand(env, text) {
       await env.USERS.put("allowed:" + chatId, JSON.stringify({ label }));
       await env.USERS.delete("pending:" + chatId);
       await send({ ...env, TELEGRAM_CHAT_ID: chatId }, "✅ Ai acces acum. Scrie /start ca să cauți bilete.");
-      return send(env, `✅ @${esc(username)} are acces acum.`);
+      return send(env, `✅ ${esc(username ? "@" + username : "ID " + chatId)} are acces acum.`);
     }
     await env.USERS.delete("allowed:" + chatId);
     return send(env, `🚫 @${esc(username)} nu mai are acces.`);
@@ -451,7 +452,8 @@ export default {
         const label = `@${username || "fără username"} (${name})`;
         if (!(await env.USERS.get("pending:" + chatId))) {
           await env.USERS.put("pending:" + chatId, JSON.stringify({ label }));
-          await send(env, `👤 Cerere de acces: ${esc(label)}\nCa să-i dai acces scrie: <code>/adauga @${esc(username)}</code>`).catch(() => {});
+          const how = username ? `/adauga @${esc(username)}` : `/adauga ${chatId}`;
+          await send(env, `👤 Cerere de acces: ${esc(label)}\nID: <code>${chatId}</code>\nCa să-i dai acces scrie: <code>${how}</code>`).catch(() => {});
         }
         await send(ctx, "🔒 Nu ai acces încă. Am trimis cererea administratorului; îți scriu când ai acces.").catch(() => {});
       }
