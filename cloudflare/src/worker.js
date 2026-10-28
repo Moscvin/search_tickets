@@ -180,6 +180,7 @@ function people({ adults, children }) {
 }
 
 function describeDays(lo, hi, weekend) {
+  if (lo === 0 && hi === 0) return "doar dus (o direcție)";
   if (weekend) return "weekend (Vi/Sâ → Du/Lu)";
   return lo === hi ? `${lo} zile` : `${lo}–${hi} zile`;
 }
@@ -261,6 +262,7 @@ function menuCountries(catalog, origin, page, token) {
 function menuDays(catalog, origin, place, token) {
   const keyboard = rows(DAY_OPTIONS.map(([label, lo, hi]) => button(label, `x:${origin}:${place}:${lo}:${hi}:0:${token}`)), 4);
   keyboard.push([button("🏖 Weekend (Vi/Sâ → Du/Lu)", `x:${origin}:${place}:1:3:1:${token}`)]);
+  keyboard.push([button("➡️ Doar dus (o direcție)", `x:${origin}:${place}:0:0:0:${token}`)]);
   keyboard.push([button("◀️ Alt oraș destinație", `o:${origin}:${token}`)]);
   return [windowHeader(token) +
     `✈️ <b>${originName(origin)} → ${esc(placeName(catalog, origin, place))}</b>\nCâte zile stai?`, keyboard];

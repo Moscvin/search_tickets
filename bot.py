@@ -250,6 +250,11 @@ def parse_query(text: str) -> tuple[str, str, int, int, dt.date, dt.date, Option
 
     Perioada: „3 luni” (de azi), „peste 6-12 luni” (între luna 6 și 12 de acum); implicit DAYS_AHEAD zile."""
     text, opts = parse_options(text.strip())
+    oneway = bool(re.search(r"\b(doar dus|dus simplu|o direcție|o directie|într-o direcție|intr-o directie|one\s?way)\b",
+                            text, re.I))
+    if oneway:  # doar dus: fără întoarcere, deci fără zile de ședere
+        text = re.sub(r"\b(doar dus|dus simplu|o direcție|o directie|într-o direcție|intr-o directie|one\s?way)\b",
+                      " ", text, flags=re.I)
     min_days, max_days = (1, 3) if opts.weekend else (st.TRIP_MIN_DAYS, st.TRIP_MAX_DAYS)
     start, end = default_window()
     m = re.search(r"peste\s+(\d{1,2})\s*(?:-|–|—|\.\.)\s*(\d{1,2})\s*(?:luni|lună|luna)\b", text, re.I)
@@ -280,7 +285,10 @@ def parse_query(text: str) -> tuple[str, str, int, int, dt.date, dt.date, Option
         if len(words) != 2:
             return None
         parts = words
-    if not (1 <= min_days <= max_days <= 30) or not (st.TODAY < end <= st.TODAY + dt.timedelta(days=400)):
+    if oneway:
+        min_days = max_days = 0
+    if not ((min_days == 0 and oneway) or 1 <= min_days <= max_days <= 30) or \
+            not (st.TODAY < end <= st.TODAY + dt.timedelta(days=400)):
         return None
     if not (1 <= opts.adults <= 9 and 0 <= opts.children <= 9):
         return None
@@ -366,6 +374,8 @@ def search_route(s, origins: list[str], destinations: list[str], min_days: int, 
 
     st.DIRECT_ONLY = True
     run(st.SOURCES)
+    if min_days == 0:  # doar dus: nu există întoarcere, deci nici variante cu escală
+        return oneway_results(flights, anywhere), [], errors
     if anywhere:  # cea mai ieftină variantă pentru fiecare oraș
         return st.cheapest_trips(flights, names), [], errors
     direct = st.all_trips(flights, names, direct_only=True)
@@ -390,14 +400,54 @@ def pick(trips: list, limit: int) -> list:
     return shown
 
 
+def oneway_results(flights: list, anywhere: bool) -> list:
+    """Doar dus: cel mai ieftin zbor pe destinație („Oriunde”) sau pe dată și aeroport, sortat după preț."""
+    seen, shown = set(), []
+    for f in sorted((f for f in flights if f.outbound and not f.return_date), key=lambda f: f.price_eur):
+        key = (f.home, f.place) if anywhere else (f.home, f.date, f.airport)
+        if key not in seen:
+            seen.add(key)
+            shown.append(f)
+    return shown
+
+
 def describe(min_days: int, max_days: int, opts: Options) -> str:
+    if min_days == 0:
+        return f"doar dus, {opts.people}"
     days = "weekend (Vi/Sâ → Du/Lu)" if opts.weekend else (
         f"{min_days} zile" if min_days == max_days else f"{min_days}–{max_days} zile")
     return f"{days}, {opts.people}"
 
 
+def oneway_line(i: int, f) -> str:
+    total = f.price_eur * st.passengers()
+    return (f"{i}. <b>{html.escape(st.ORIGIN_NAMES.get(f.home, f.home))} → "
+            f"{html.escape(st.city_name(f.place, st.AIRPORT_NAMES))}</b> — <b>€{total:.0f}</b> · "
+            f"{st.fmt_date(f.date)} · {html.escape(f.airline)} · "
+            f"<a href=\"{html.escape(f.link)}\">bilet</a>")
+
+
+def format_oneway(origin_name: str, dest_name: str, opts: Options, legs: list, errors: list) -> str:
+    route = f"{html.escape(origin_name)} → {html.escape(dest_name)}"
+    window = f"(plecare: {window_label(st.FIRST_OUTBOUND, st.LAST_OUTBOUND)})\n"
+    if dest_name == "🌍 Oriunde":
+        lines = [f"🌍 <b>Cele mai ieftine destinații din {html.escape(origin_name)}</b>\n"
+                 f"doar dus, {opts.people}, doar zboruri directe\n{window}"]
+        shown = legs[:15]
+    else:
+        lines = [f"✈️ <b>{route}</b>, doar dus, {opts.people}, doar zboruri directe\n{window}"]
+        shown = legs[:RESULTS]
+    lines += [oneway_line(i, f) for i, f in enumerate(shown, 1)] or [
+        "❌ Nu am găsit zboruri directe în criteriile alese."]
+    if errors:
+        lines.append("⚠️ Unele surse n-au răspuns: " + html.escape("; ".join(errors)))
+    return "\n\n".join(lines)
+
+
 def format_reply(origin_name: str, dest_name: str, min_days: int, max_days: int, opts: Options,
                  direct: list, with_stops: list, errors: list) -> str:
+    if min_days == 0:
+        return format_oneway(origin_name, dest_name, opts, direct, errors)
     days = describe(min_days, max_days, opts)
     route = f"{html.escape(origin_name)} → {html.escape(dest_name)}"
     lines = [f"✈️ <b>{route}</b>, dus-întors, {days}, doar zboruri directe\n"
@@ -690,6 +740,7 @@ def menu_days(catalog: dict, origin: str, place: str, token: str) -> tuple[str, 
     row = [button(label, f"x:{origin}:{place}:{lo}:{hi}:0:{token}") for label, lo, hi in DAY_OPTIONS]
     keyboard = [row[i:i + 4] for i in range(0, len(row), 4)]
     keyboard.append([button("🏖 Weekend (Vi/Sâ → Du/Lu)", f"x:{origin}:{place}:1:3:1:{token}")])
+    keyboard.append([button("➡️ Doar dus (o direcție)", f"x:{origin}:{place}:0:0:0:{token}")])
     keyboard.append([button("◀️ Alt oraș destinație", f"o:{origin}:{token}")])
     return (window_header(token) +
             f"✈️ <b>{st.ORIGIN_NAMES.get(origin, origin)} → {html.escape(name)}</b>\nCâte zile stai?"), keyboard
