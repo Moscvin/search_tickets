@@ -10,6 +10,9 @@ on:
       text:
         description: "Mesajul scris botului (ex. Chișinău - Dubai 7 zile)"
         required: false
+      chat:
+        description: "Chat-ul la care trimitem rezultatul (implicit: adminul)"
+        required: false
 
 jobs:
   search:
@@ -32,5 +35,6 @@ jobs:
           TRAVELPAYOUTS_TOKEN: ${{ secrets.TRAVELPAYOUTS_TOKEN }}
           BUTTON: ${{ inputs.button }}
           TEXT: ${{ inputs.text }}
+          CHAT: ${{ inputs.chat }}
         run: |
           if [ -n "$BUTTON" ]; then python bot.py --run-button "$BUTTON"; else python bot.py --run-text "$TEXT"; fi

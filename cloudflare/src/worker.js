@@ -7,8 +7,8 @@
 //
 // Textele și datele butoanelor sunt aceleași ca în bot.py, ca să rămână compatibile.
 
-const ORIGINS = ["RMO", "IAS", "OTP", "IST"];
-const ORIGIN_NAMES = { RMO: "Chișinău", IAS: "Iași", OTP: "București", IST: "Istanbul" };
+const ORIGINS = ["RMO", "IAS", "OTP", "IST", "VRN", "BLQ", "BGY"];
+const ORIGIN_NAMES = { RMO: "Chișinău", IAS: "Iași", OTP: "București", IST: "Istanbul", VRN: "Verona", BLQ: "Bologna", BGY: "Milano" };
 const COUNTRIES = {
   TH: ["🇹🇭 Thailanda", ["BKK", "HKT"]],
   VN: ["🇻🇳 Vietnam", ["HAN", "SGN"]],
@@ -212,7 +212,7 @@ function menuToMonth(firstMonth) {
 const windowHeader = (token) => `📅 Plecare: ${windowLabel(...parseWindow(token))}\n`;
 
 function menuOrigins(token) {
-  const keyboard = [ORIGINS.map((o) => button(originName(o), `o:${o}:${token}`)),
+  const keyboard = [...rows(ORIGINS.map((o) => button(originName(o), `o:${o}:${token}`)), 3),
     [button("◀️ Altă perioadă", "start")]];
   return [windowHeader(token) + "✈️ <b>De unde zbori?</b>", keyboard];
 }
@@ -298,6 +298,7 @@ const edit = (env, msg, text, keyboard) => telegram(env, "editMessageText", {
 });
 
 async function dispatch(env, workflow, inputs = {}) {
+  if (workflow === "search_request.yml") inputs = { ...inputs, chat: String(env.TELEGRAM_CHAT_ID) };
   const r = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/actions/workflows/${workflow}/dispatches`, {
     method: "POST",
     headers: {
@@ -366,6 +367,59 @@ async function onCallback(env, cb) {
   }
 }
 
+// --------------------------------------------------------------------------- acces
+
+const isAdmin = (env, chatId) => String(chatId) === String(env.ADMIN_CHAT_ID || env.TELEGRAM_CHAT_ID);
+
+async function allowedUser(env, chatId) {
+  return (await env.USERS.get("allowed:" + chatId)) !== null;
+}
+
+// Cine a scris botului: reținem username-ul, ca adminul să poată adăuga pe @username
+async function rememberUser(env, chatId, from) {
+  const username = from?.username ? from.username.toLowerCase() : "";
+  const name = [from?.first_name, from?.last_name].filter(Boolean).join(" ") || "fără nume";
+  if (username) await env.USERS.put("name:" + username, String(chatId));
+  return { username, name };
+}
+
+async function onAdminCommand(env, text) {
+  const [cmd, rawUser] = text.trim().split(/\s+/);
+  const username = (rawUser || "").replace(/^@/, "").toLowerCase();
+  if (cmd === "/utilizatori") {
+    const lines = async (prefix) => {
+      const { keys } = await env.USERS.list({ prefix });
+      const out = [];
+      for (const k of keys) {
+        const info = JSON.parse((await env.USERS.get(k.name)) || "{}");
+        out.push("• " + esc(info.label || k.name) + " (" + k.name.split(":")[1] + ")");
+      }
+      return out.join("\n");
+    };
+    return send(env, "👥 <b>Utilizatori cu acces</b>\n" + ((await lines("allowed:")) || "(niciunul)") +
+      "\n\n⏳ <b>Cereri în așteptare</b>\n" + ((await lines("pending:")) || "(niciuna)"));
+  }
+  if (cmd === "/adauga" || cmd === "/sterge") {
+    if (!username) return send(env, "Scrie: <code>" + cmd + " @username</code>");
+    const chatId = await env.USERS.get("name:" + username);
+    if (!chatId) return send(env, `Nu cunosc pe @${esc(username)}. Trebuie să-i scrie botului întâi.`);
+    if (cmd === "/adauga") {
+      const pending = await env.USERS.get("pending:" + chatId);
+      const label = pending ? JSON.parse(pending).label : "@" + username;
+      await env.USERS.put("allowed:" + chatId, JSON.stringify({ label }));
+      await env.USERS.delete("pending:" + chatId);
+      await send({ ...env, TELEGRAM_CHAT_ID: chatId }, "✅ Ai acces acum. Scrie /start ca să cauți bilete.");
+      return send(env, `✅ @${esc(username)} are acces acum.`);
+    }
+    await env.USERS.delete("allowed:" + chatId);
+    return send(env, `🚫 @${esc(username)} nu mai are acces.`);
+  }
+  return send(env, "Comenzi admin:\n" +
+    "• <code>/adauga @username</code> – dă acces (utilizatorul trebuie să fi scris botului)\n" +
+    "• <code>/sterge @username</code> – scoate accesul\n" +
+    "• <code>/utilizatori</code> – lista cu cine are acces și cererile în așteptare");
+}
+
 export default {
   async fetch(request, env) {
     if (request.method !== "POST") return new Response("ticketplanebot ok");
@@ -376,14 +430,34 @@ export default {
     const update = await request.json();
     const cb = update.callback_query;
     const msg = update.message;
-    const chatId = cb ? cb.message?.chat?.id : msg?.chat?.id;
-    if (String(chatId) !== String(env.TELEGRAM_CHAT_ID)) return new Response("ok"); // doar proprietarul
+    if (!msg?.text && !cb) return new Response("ok");
+    const chatId = String(cb ? cb.message?.chat?.id : msg?.chat?.id);
+    const from = cb ? cb.from : msg.from;
+    const { username, name } = await rememberUser(env, chatId, from);
+
+    // ctx: răspunsurile merg la chat-ul celui care a scris (la admin, la același chat)
+    const ctx = { ...env, TELEGRAM_CHAT_ID: chatId };
     try {
-      if (cb) await onCallback(env, cb);
-      else if (msg?.text) await onMessage(env, msg.text);
+      if (isAdmin(env, chatId)) {
+        if (msg?.text?.startsWith("/adauga") || msg?.text?.startsWith("/sterge") || msg?.text?.startsWith("/utilizatori") || msg?.text === "/comenzi") {
+          await onAdminCommand(env, msg.text);
+        } else if (cb) await onCallback(ctx, cb);
+        else if (msg?.text) await onMessage(ctx, msg.text);
+      } else if (await allowedUser(env, chatId)) {
+        if (cb) await onCallback(ctx, cb);
+        else if (msg?.text) await onMessage(ctx, msg.text);
+      } else {
+        // utilizator nou: îi cerem adminului accesul, o singură notificare
+        const label = `@${username || "fără username"} (${name})`;
+        if (!(await env.USERS.get("pending:" + chatId))) {
+          await env.USERS.put("pending:" + chatId, JSON.stringify({ label }));
+          await send(env, `👤 Cerere de acces: ${esc(label)}\nCa să-i dai acces scrie: <code>/adauga @${esc(username)}</code>`).catch(() => {});
+        }
+        await send(ctx, "🔒 Nu ai acces încă. Am trimis cererea administratorului; îți scriu când ai acces.").catch(() => {});
+      }
     } catch (e) {
       console.error(e);
-      await send(env, `⚠️ A apărut o eroare: ${esc(e.message)}`).catch(() => {});
+      await send(ctx, `⚠️ A apărut o eroare: ${esc(e.message)}`).catch(() => {});
     }
     return new Response("ok"); // mereu 200, altfel Telegram retrimite același mesaj
   },

@@ -455,6 +455,8 @@ MENU_ORIGINS = list(st.ORIGINS)  # copiat înainte ca search_route să modifice 
 KIWI_DEFAULT = [d.strip() for d in st.KIWI_DESTINATIONS.split(",") if d.strip()]  # idem, pentru „Oriunde”
 
 
+# Orașe de plecare cu zboruri către multe destinații: verificăm toată lista largă cu Kiwi
+KIWI_BROAD_ORIGINS = {"IST", "VRN", "BLQ", "BGY"}
 KIWI_IST_CANDIDATES = [a.strip() for a in (os.environ.get("KIWI_IST_DESTINATIONS") or (
     "ABV,ACC,ADD,AGP,ALA,ALG,AMM,AMS,ARN,ASB,ATH,ATL,AUH,BAH,BCN,BEG,BER,BEY,BGW,BHX,BIO,BKK,BLQ,BOD,BOM,BOS,BRI,BRU,BSL,BUD,BUS,CAI,CAN,CCS,CDG,CGK,CGN,CLJ,CMB,CMN,CND,CPH,CPT,CTA,CUN,DAC,DAR,DBV,DEL,DFW,DMM,DOH,DPS,DSS,DUB,DUS,DXB,DYU,EBB,EBL,EDI,EVN,EWR,FCO,FRA,GDN,GOT,GRU,GVA,GYD,HAM,HAN,HEL,HER,HKG,HKT,HND,HRG,IAD,IAH,ICN,INI,ISB,JED,JFK,JNB,JRO,JTR,KHI,KIX,KRK,KTM,KUL,KWI,LAX,LGW,LHE,LHR,LIS,LJU,LOS,LTN,LUX,LYS,MAD,MAN,MBA,MCT,MED,MEL,MEX,MIA,MLA,MLE,MNL,MRS,MRU,MUC,MXP,NAP,NBO,NCE,NQZ,NRT,NUE,OPO,ORD,ORN,ORY,OSL,OTP,PEK,PMO,PRG,PRN,PVG,RAK,RIX,RUH,SEZ,SFO,SGN,SHJ,SIN,SJJ,SKD,SKG,SKP,SOF,SPU,SSH,STN,STR,SVQ,SYD,SZG,TAS,TBS,TIA,TIV,TLL,TLS,TPE,TRN,TSR,TUN,VAR,VCE,VIE,VLC,VNO,WAW,XIY,YUL,YVR,YYZ,ZAG,ZNZ,ZRH"
 )).split(",") if a.strip()]
@@ -526,7 +528,8 @@ def route_catalog(s) -> dict[str, dict[str, dict]]:
     # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...): doar dacă Kiwi găsește un zbor direct.
     # Din Istanbul zboară multe mai multe companii, deci lista de candidați e mai mare
     for o in MENU_ORIGINS:
-        candidates = KIWI_IST_CANDIDATES if o == "IST" else (d.strip() for d in st.KIWI_DESTINATIONS.split(","))
+        candidates = KIWI_IST_CANDIDATES if o in KIWI_BROAD_ORIGINS else (
+            d.strip() for d in st.KIWI_DESTINATIONS.split(","))
         for d in candidates:
             if not d or d in found[o] or st.city_of(d) == st.city_of(o):
                 continue
@@ -850,6 +853,8 @@ def main() -> int:
         save_catalog(route_catalog(s), st.Path(args.export_routes))
         return 0
     if args.run_button or args.run_text:  # pornit de Worker-ul Cloudflare prin GitHub Actions
+        if os.environ.get("CHAT"):  # rezultatul merge la utilizatorul care a cerut căutarea
+            st.TELEGRAM_CHAT_ID = os.environ["CHAT"]
         try:
             if args.run_button:
                 text = run_button(s, load_catalog(s, max_age_days=30), args.run_button)

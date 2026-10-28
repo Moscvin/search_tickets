@@ -55,7 +55,7 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 TRAVELPAYOUTS_TOKEN = os.environ.get("TRAVELPAYOUTS_TOKEN", "")
 # Orașele de plecare (coduri de aeroport), în ordinea în care apar în mesaj
-ORIGINS = [o.strip().upper() for o in (os.environ.get("ORIGINS") or "RMO,IAS,OTP,IST").split(",") if o.strip()]
+ORIGINS = [o.strip().upper() for o in (os.environ.get("ORIGINS") or "RMO,IAS,OTP,IST,VRN,BLQ,BGY").split(",") if o.strip()]
 DAYS_AHEAD = env_int("DAYS_AHEAD", 180)         # plecarea: în următoarele N zile
 TRIP_MIN_DAYS = env_int("TRIP_MIN_DAYS", 2)     # întoarcerea: minim N zile după plecare
 TRIP_MAX_DAYS = env_int("TRIP_MAX_DAYS", 7)     # întoarcerea: maxim N zile după plecare
@@ -90,7 +90,8 @@ LAST_OUTBOUND = TODAY + dt.timedelta(days=DAYS_AHEAD)
 LAST_DATE = LAST_OUTBOUND + dt.timedelta(days=TRIP_MAX_DAYS)  # orizontul de căutare pentru întoarceri
 
 ORIGIN_NAMES = {"RMO": "Chișinău", "IAS": "Iași", "OTP": "București", "BBU": "București", "SCV": "Suceava",
-                "IST": "Istanbul"}
+                "IST": "Istanbul",
+                "VRN": "Verona", "BLQ": "Bologna", "BGY": "Milano"}
 
 # Aeroporturi din același oraș: dus și întors se pot combina între ele
 # (ex. dus la Milano Bergamo cu Wizz, întors din Milano Malpensa cu FlyOne).

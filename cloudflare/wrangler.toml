@@ -7,6 +7,11 @@ compatibility_date = "2024-09-23"
 [vars]
 GITHUB_REPO = "Moscvin/search_tickets"
 
+# Utilizatorii aprobați (și cererile de acces), ținute în KV
+[[kv_namespaces]]
+binding = "USERS"
+id = "a232e636a5ae4914863da62479d52784"
+
 # Programări (UTC): căutarea de luni și actualizarea zilnică a destinațiilor din meniu
 [triggers]
 crons = ["0 6 * * 1", "0 3 * * *"]
