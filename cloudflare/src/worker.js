@@ -7,8 +7,8 @@
 //
 // Textele și datele butoanelor sunt aceleași ca în bot.py, ca să rămână compatibile.
 
-const ORIGINS = ["RMO", "IAS", "OTP", "IST", "VRN", "BLQ", "BGY"];
-const ORIGIN_NAMES = { RMO: "Chișinău", IAS: "Iași", OTP: "București", IST: "Istanbul", VRN: "Verona", BLQ: "Bologna", BGY: "Milano" };
+const ORIGINS = ["RMO", "IAS", "OTP", "IST", "VRN", "BLQ", "BGY", "MXP"];
+const ORIGIN_NAMES = { RMO: "Chișinău", IAS: "Iași", OTP: "București", IST: "Istanbul", VRN: "Verona", BLQ: "Bologna", BGY: "Milano", MXP: "Milano Malpensa" };
 const COUNTRIES = {
   TH: ["🇹🇭 Thailanda", ["BKK", "HKT"]],
   VN: ["🇻🇳 Vietnam", ["HAN", "SGN"]],
