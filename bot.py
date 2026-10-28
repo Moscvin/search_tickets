@@ -513,9 +513,28 @@ KIWI_IST_CANDIDATES = [a.strip() for a in (os.environ.get("KIWI_IST_DESTINATIONS
 )).split(",") if a.strip()]
 
 
+# Numele orașelor pe care sursele le dau doar ca cod (ex. „PEK”), ca să apară întregi în meniu
+CITY_NAMES = {
+    "ABV": "Abuja", "ACC": "Accra", "ADD": "Addis Abeba", "ALG": "Alger", "ASB": "Așgabat", "ATL": "Atlanta",
+    "BAH": "Bahrain", "BEY": "Beirut", "BGW": "Bagdad", "BKK": "Bangkok", "BOM": "Mumbai", "BOS": "Boston",
+    "CAI": "Cairo", "CAN": "Guangzhou", "CCS": "Caracas", "CGK": "Jakarta", "CMB": "Colombo", "CMN": "Casablanca",
+    "CPT": "Cape Town", "CUN": "Cancún", "DAC": "Dhaka", "DAR": "Dar es Salaam", "DEL": "New Delhi", "DFW": "Dallas",
+    "DMM": "Dammam", "DOH": "Doha", "DPS": "Denpasar (Bali)", "DSS": "Dakar", "EBB": "Entebbe", "EBL": "Erbil",
+    "EWR": "Newark", "GRU": "São Paulo", "HAN": "Hanoi", "HKG": "Hong Kong", "HKT": "Phuket", "HND": "Tokyo Haneda",
+    "IAD": "Washington Dulles", "IAH": "Houston", "ICN": "Seul", "ISB": "Islamabad", "JNB": "Johannesburg",
+    "JRO": "Kilimanjaro", "KHI": "Karachi", "KIX": "Osaka", "KTM": "Kathmandu", "KUL": "Kuala Lumpur", "KWI": "Kuweit",
+    "LAX": "Los Angeles", "LHE": "Lahore", "LOS": "Lagos", "MBA": "Mombasa", "MED": "Medina", "MEL": "Melbourne",
+    "MEX": "Ciudad de Mexic", "MIA": "Miami", "MLE": "Male", "MNL": "Manila", "MRU": "Mauritius", "NBO": "Nairobi",
+    "NQZ": "Astana", "NRT": "Tokyo Narita", "ORD": "Chicago", "ORN": "Oran", "PEK": "Beijing", "PVG": "Shanghai",
+    "RUH": "Riyadh", "SEZ": "Seychelles", "SFO": "San Francisco", "SGN": "Ho Chi Minh City", "SIN": "Singapore",
+    "SKD": "Samarkand", "SZG": "Salzburg", "TPE": "Taipei", "TUN": "Tunis", "XIY": "Xi'an", "YUL": "Montreal",
+    "YVR": "Vancouver", "YYZ": "Toronto", "ZNZ": "Zanzibar",
+}
+
+
 def route_catalog(s) -> dict[str, dict[str, dict]]:
     """Destinațiile spre care există zboruri, pe oraș: {"RMO": {"MIL": {"name": "Milano", "airports": {...}}}}."""
-    names: dict[str, str] = dict(st.AIRPORT_NAMES)
+    names: dict[str, str] = {**st.AIRPORT_NAMES, **CITY_NAMES}
     found: dict[str, set[str]] = {o: set() for o in MENU_ORIGINS}
 
     def collect(label: str, fn) -> None:

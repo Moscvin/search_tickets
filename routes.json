@@ -1242,25 +1242,25 @@
     ]
    },
    "ABV": {
-    "name": "ABV",
+    "name": "Abuja",
     "airports": [
      "ABV"
     ]
    },
    "ACC": {
-    "name": "ACC",
+    "name": "Accra",
     "airports": [
      "ACC"
     ]
    },
    "ADD": {
-    "name": "ADD",
+    "name": "Addis Abeba",
     "airports": [
      "ADD"
     ]
    },
    "ALG": {
-    "name": "ALG",
+    "name": "Alger",
     "airports": [
      "ALG"
     ]
@@ -1284,7 +1284,7 @@
     ]
    },
    "ASB": {
-    "name": "ASB",
+    "name": "Așgabat",
     "airports": [
      "ASB"
     ]
@@ -1296,13 +1296,13 @@
     ]
    },
    "ATL": {
-    "name": "ATL",
+    "name": "Atlanta",
     "airports": [
      "ATL"
     ]
    },
    "BAH": {
-    "name": "BAH",
+    "name": "Bahrain",
     "airports": [
      "BAH"
     ]
@@ -1350,13 +1350,13 @@
     ]
    },
    "BEY": {
-    "name": "BEY",
+    "name": "Beirut",
     "airports": [
      "BEY"
     ]
    },
    "BGW": {
-    "name": "BGW",
+    "name": "Bagdad",
     "airports": [
      "BGW"
     ]
@@ -1374,7 +1374,7 @@
     ]
    },
    "BKK": {
-    "name": "BKK",
+    "name": "Bangkok",
     "airports": [
      "BKK"
     ]
@@ -1386,7 +1386,7 @@
     ]
    },
    "BOM": {
-    "name": "BOM",
+    "name": "Mumbai",
     "airports": [
      "BOM"
     ]
@@ -1398,7 +1398,7 @@
     ]
    },
    "BOS": {
-    "name": "BOS",
+    "name": "Boston",
     "airports": [
      "BOS"
     ]
@@ -1422,13 +1422,13 @@
     ]
    },
    "CAI": {
-    "name": "CAI",
+    "name": "Cairo",
     "airports": [
      "CAI"
     ]
    },
    "CAN": {
-    "name": "CAN",
+    "name": "Guangzhou",
     "airports": [
      "CAN"
     ]
@@ -1440,13 +1440,13 @@
     ]
    },
    "CCS": {
-    "name": "CCS",
+    "name": "Caracas",
     "airports": [
      "CCS"
     ]
    },
    "CGK": {
-    "name": "CGK",
+    "name": "Jakarta",
     "airports": [
      "CGK"
     ]
@@ -1458,13 +1458,13 @@
     ]
    },
    "CMB": {
-    "name": "CMB",
+    "name": "Colombo",
     "airports": [
      "CMB"
     ]
    },
    "CMN": {
-    "name": "CMN",
+    "name": "Casablanca",
     "airports": [
      "CMN"
     ]
@@ -1482,25 +1482,25 @@
     ]
    },
    "CPT": {
-    "name": "CPT",
+    "name": "Cape Town",
     "airports": [
      "CPT"
     ]
    },
    "CUN": {
-    "name": "CUN",
+    "name": "Cancún",
     "airports": [
      "CUN"
     ]
    },
    "DAC": {
-    "name": "DAC",
+    "name": "Dhaka",
     "airports": [
      "DAC"
     ]
    },
    "DAR": {
-    "name": "DAR",
+    "name": "Dar es Salaam",
     "airports": [
      "DAR"
     ]
@@ -1512,37 +1512,37 @@
     ]
    },
    "DEL": {
-    "name": "DEL",
+    "name": "New Delhi",
     "airports": [
      "DEL"
     ]
    },
    "DFW": {
-    "name": "DFW",
+    "name": "Dallas",
     "airports": [
      "DFW"
     ]
    },
    "DMM": {
-    "name": "DMM",
+    "name": "Dammam",
     "airports": [
      "DMM"
     ]
    },
    "DOH": {
-    "name": "DOH",
+    "name": "Doha",
     "airports": [
      "DOH"
     ]
    },
    "DPS": {
-    "name": "DPS",
+    "name": "Denpasar (Bali)",
     "airports": [
      "DPS"
     ]
    },
    "DSS": {
-    "name": "DSS",
+    "name": "Dakar",
     "airports": [
      "DSS"
     ]
@@ -1578,13 +1578,13 @@
     ]
    },
    "EBB": {
-    "name": "EBB",
+    "name": "Entebbe",
     "airports": [
      "EBB"
     ]
    },
    "EBL": {
-    "name": "EBL",
+    "name": "Erbil",
     "airports": [
      "EBL"
     ]
@@ -1596,7 +1596,7 @@
     ]
    },
    "EWR": {
-    "name": "EWR",
+    "name": "Newark",
     "airports": [
      "EWR"
     ]
@@ -1626,7 +1626,7 @@
     ]
    },
    "GRU": {
-    "name": "GRU",
+    "name": "São Paulo",
     "airports": [
      "GRU"
     ]
@@ -1638,7 +1638,7 @@
     ]
    },
    "HAN": {
-    "name": "HAN",
+    "name": "Hanoi",
     "airports": [
      "HAN"
     ]
@@ -1656,19 +1656,19 @@
     ]
    },
    "HKG": {
-    "name": "HKG",
+    "name": "Hong Kong",
     "airports": [
      "HKG"
     ]
    },
    "HKT": {
-    "name": "HKT",
+    "name": "Phuket",
     "airports": [
      "HKT"
     ]
    },
    "HND": {
-    "name": "HND",
+    "name": "Tokyo Haneda",
     "airports": [
      "HND"
     ]
@@ -1680,13 +1680,13 @@
     ]
    },
    "IAD": {
-    "name": "IAD",
+    "name": "Washington Dulles",
     "airports": [
      "IAD"
     ]
    },
    "IAH": {
-    "name": "IAH",
+    "name": "Houston",
     "airports": [
      "IAH"
     ]
@@ -1698,13 +1698,13 @@
     ]
    },
    "ICN": {
-    "name": "ICN",
+    "name": "Seul",
     "airports": [
      "ICN"
     ]
    },
    "ISB": {
-    "name": "ISB",
+    "name": "Islamabad",
     "airports": [
      "ISB"
     ]
@@ -1716,25 +1716,25 @@
     ]
    },
    "JNB": {
-    "name": "JNB",
+    "name": "Johannesburg",
     "airports": [
      "JNB"
     ]
    },
    "JRO": {
-    "name": "JRO",
+    "name": "Kilimanjaro",
     "airports": [
      "JRO"
     ]
    },
    "KHI": {
-    "name": "KHI",
+    "name": "Karachi",
     "airports": [
      "KHI"
     ]
    },
    "KIX": {
-    "name": "KIX",
+    "name": "Osaka",
     "airports": [
      "KIX"
     ]
@@ -1752,31 +1752,31 @@
     ]
    },
    "KTM": {
-    "name": "KTM",
+    "name": "Kathmandu",
     "airports": [
      "KTM"
     ]
    },
    "KUL": {
-    "name": "KUL",
+    "name": "Kuala Lumpur",
     "airports": [
      "KUL"
     ]
    },
    "KWI": {
-    "name": "KWI",
+    "name": "Kuweit",
     "airports": [
      "KWI"
     ]
    },
    "LAX": {
-    "name": "LAX",
+    "name": "Los Angeles",
     "airports": [
      "LAX"
     ]
    },
    "LHE": {
-    "name": "LHE",
+    "name": "Lahore",
     "airports": [
      "LHE"
     ]
@@ -1803,7 +1803,7 @@
     ]
    },
    "LOS": {
-    "name": "LOS",
+    "name": "Lagos",
     "airports": [
      "LOS"
     ]
@@ -1857,31 +1857,31 @@
     ]
    },
    "MBA": {
-    "name": "MBA",
+    "name": "Mombasa",
     "airports": [
      "MBA"
     ]
    },
    "MED": {
-    "name": "MED",
+    "name": "Medina",
     "airports": [
      "MED"
     ]
    },
    "MEL": {
-    "name": "MEL",
+    "name": "Melbourne",
     "airports": [
      "MEL"
     ]
    },
    "MEX": {
-    "name": "MEX",
+    "name": "Ciudad de Mexic",
     "airports": [
      "MEX"
     ]
    },
    "MIA": {
-    "name": "MIA",
+    "name": "Miami",
     "airports": [
      "MIA"
     ]
@@ -1893,19 +1893,19 @@
     ]
    },
    "MLE": {
-    "name": "MLE",
+    "name": "Male",
     "airports": [
      "MLE"
     ]
    },
    "MNL": {
-    "name": "MNL",
+    "name": "Manila",
     "airports": [
      "MNL"
     ]
    },
    "MRU": {
-    "name": "MRU",
+    "name": "Mauritius",
     "airports": [
      "MRU"
     ]
@@ -1929,7 +1929,7 @@
     ]
    },
    "NBO": {
-    "name": "NBO",
+    "name": "Nairobi",
     "airports": [
      "NBO"
     ]
@@ -1953,13 +1953,13 @@
     ]
    },
    "NQZ": {
-    "name": "NQZ",
+    "name": "Astana",
     "airports": [
      "NQZ"
     ]
    },
    "NRT": {
-    "name": "NRT",
+    "name": "Tokyo Narita",
     "airports": [
      "NRT"
     ]
@@ -1971,13 +1971,13 @@
     ]
    },
    "ORD": {
-    "name": "ORD",
+    "name": "Chicago",
     "airports": [
      "ORD"
     ]
    },
    "ORN": {
-    "name": "ORN",
+    "name": "Oran",
     "airports": [
      "ORN"
     ]
@@ -2002,7 +2002,7 @@
     ]
    },
    "PEK": {
-    "name": "PEK",
+    "name": "Beijing",
     "airports": [
      "PEK"
     ]
@@ -2026,7 +2026,7 @@
     ]
    },
    "PVG": {
-    "name": "PVG",
+    "name": "Shanghai",
     "airports": [
      "PVG"
     ]
@@ -2044,7 +2044,7 @@
     ]
    },
    "RUH": {
-    "name": "RUH",
+    "name": "Riyadh",
     "airports": [
      "RUH"
     ]
@@ -2068,19 +2068,19 @@
     ]
    },
    "SEZ": {
-    "name": "SEZ",
+    "name": "Seychelles",
     "airports": [
      "SEZ"
     ]
    },
    "SFO": {
-    "name": "SFO",
+    "name": "San Francisco",
     "airports": [
      "SFO"
     ]
    },
    "SGN": {
-    "name": "SGN",
+    "name": "Ho Chi Minh City",
     "airports": [
      "SGN"
     ]
@@ -2098,13 +2098,13 @@
     ]
    },
    "SIN": {
-    "name": "SIN",
+    "name": "Singapore",
     "airports": [
      "SIN"
     ]
    },
    "SKD": {
-    "name": "SKD",
+    "name": "Samarkand",
     "airports": [
      "SKD"
     ]
@@ -2140,7 +2140,7 @@
     ]
    },
    "SZG": {
-    "name": "SZG",
+    "name": "Salzburg",
     "airports": [
      "SZG"
     ]
@@ -2194,13 +2194,13 @@
     ]
    },
    "TPE": {
-    "name": "TPE",
+    "name": "Taipei",
     "airports": [
      "TPE"
     ]
    },
    "TUN": {
-    "name": "TUN",
+    "name": "Tunis",
     "airports": [
      "TUN"
     ]
@@ -2248,7 +2248,7 @@
     ]
    },
    "XIY": {
-    "name": "XIY",
+    "name": "Xi'an",
     "airports": [
      "XIY"
     ]
@@ -2260,19 +2260,19 @@
     ]
    },
    "YUL": {
-    "name": "YUL",
+    "name": "Montreal",
     "airports": [
      "YUL"
     ]
    },
    "YVR": {
-    "name": "YVR",
+    "name": "Vancouver",
     "airports": [
      "YVR"
     ]
    },
    "YYZ": {
-    "name": "YYZ",
+    "name": "Toronto",
     "airports": [
      "YYZ"
     ]
@@ -2284,7 +2284,7 @@
     ]
    },
    "ZNZ": {
-    "name": "ZNZ",
+    "name": "Zanzibar",
     "airports": [
      "ZNZ"
     ]
@@ -2358,7 +2358,7 @@
     ]
    },
    "CMN": {
-    "name": "CMN",
+    "name": "Casablanca",
     "airports": [
      "CMN"
     ]
@@ -2370,7 +2370,7 @@
     ]
    },
    "DSS": {
-    "name": "DSS",
+    "name": "Dakar",
     "airports": [
      "DSS"
     ]
@@ -2449,7 +2449,7 @@
     ]
    },
    "MBA": {
-    "name": "MBA",
+    "name": "Mombasa",
     "airports": [
      "MBA"
     ]
@@ -2545,7 +2545,7 @@
     ]
    },
    "ZNZ": {
-    "name": "ZNZ",
+    "name": "Zanzibar",
     "airports": [
      "ZNZ"
     ]
@@ -2668,7 +2668,7 @@
     ]
    },
    "CMN": {
-    "name": "CMN",
+    "name": "Casablanca",
     "airports": [
      "CMN"
     ]
@@ -3018,7 +3018,7 @@
     ]
    },
    "TUN": {
-    "name": "TUN",
+    "name": "Tunis",
     "airports": [
      "TUN"
     ]
@@ -3195,7 +3195,7 @@
     ]
    },
    "CAI": {
-    "name": "CAI",
+    "name": "Cairo",
     "airports": [
      "CAI"
     ]
@@ -3231,7 +3231,7 @@
     ]
    },
    "CMN": {
-    "name": "CMN",
+    "name": "Casablanca",
     "airports": [
      "CMN"
     ]
@@ -3267,7 +3267,7 @@
     ]
    },
    "DSS": {
-    "name": "DSS",
+    "name": "Dakar",
     "airports": [
      "DSS"
     ]
@@ -3841,7 +3841,7 @@
     ]
    },
    "ADD": {
-    "name": "ADD",
+    "name": "Addis Abeba",
     "airports": [
      "ADD"
     ]
@@ -3853,7 +3853,7 @@
     ]
    },
    "ALG": {
-    "name": "ALG",
+    "name": "Alger",
     "airports": [
      "ALG"
     ]
@@ -3889,7 +3889,7 @@
     ]
    },
    "ASB": {
-    "name": "ASB",
+    "name": "Așgabat",
     "airports": [
      "ASB"
     ]
@@ -3901,13 +3901,13 @@
     ]
    },
    "ATL": {
-    "name": "ATL",
+    "name": "Atlanta",
     "airports": [
      "ATL"
     ]
    },
    "BAH": {
-    "name": "BAH",
+    "name": "Bahrain",
     "airports": [
      "BAH"
     ]
@@ -3943,7 +3943,7 @@
     ]
    },
    "BEY": {
-    "name": "BEY",
+    "name": "Beirut",
     "airports": [
      "BEY"
     ]
@@ -3961,7 +3961,7 @@
     ]
    },
    "BKK": {
-    "name": "BKK",
+    "name": "Bangkok",
     "airports": [
      "BKK"
     ]
@@ -4015,7 +4015,7 @@
     ]
    },
    "CAI": {
-    "name": "CAI",
+    "name": "Cairo",
     "airports": [
      "CAI"
     ]
@@ -4045,7 +4045,7 @@
     ]
    },
    "CMN": {
-    "name": "CMN",
+    "name": "Casablanca",
     "airports": [
      "CMN"
     ]
@@ -4075,13 +4075,13 @@
     ]
    },
    "DEL": {
-    "name": "DEL",
+    "name": "New Delhi",
     "airports": [
      "DEL"
     ]
    },
    "DOH": {
-    "name": "DOH",
+    "name": "Doha",
     "airports": [
      "DOH"
     ]
@@ -4093,7 +4093,7 @@
     ]
    },
    "DSS": {
-    "name": "DSS",
+    "name": "Dakar",
     "airports": [
      "DSS"
     ]
@@ -4165,7 +4165,7 @@
     ]
    },
    "GRU": {
-    "name": "GRU",
+    "name": "São Paulo",
     "airports": [
      "GRU"
     ]
@@ -4177,7 +4177,7 @@
     ]
    },
    "HAN": {
-    "name": "HAN",
+    "name": "Hanoi",
     "airports": [
      "HAN"
     ]
@@ -4195,13 +4195,13 @@
     ]
    },
    "HKG": {
-    "name": "HKG",
+    "name": "Hong Kong",
     "airports": [
      "HKG"
     ]
    },
    "HND": {
-    "name": "HND",
+    "name": "Tokyo Haneda",
     "airports": [
      "HND"
     ]
@@ -4219,7 +4219,7 @@
     ]
    },
    "ICN": {
-    "name": "ICN",
+    "name": "Seul",
     "airports": [
      "ICN"
     ]
@@ -4255,7 +4255,7 @@
     ]
    },
    "KWI": {
-    "name": "KWI",
+    "name": "Kuweit",
     "airports": [
      "KWI"
     ]
@@ -4353,25 +4353,25 @@
     ]
    },
    "MBA": {
-    "name": "MBA",
+    "name": "Mombasa",
     "airports": [
      "MBA"
     ]
    },
    "MEX": {
-    "name": "MEX",
+    "name": "Ciudad de Mexic",
     "airports": [
      "MEX"
     ]
    },
    "MIA": {
-    "name": "MIA",
+    "name": "Miami",
     "airports": [
      "MIA"
     ]
    },
    "MLE": {
-    "name": "MLE",
+    "name": "Male",
     "airports": [
      "MLE"
     ]
@@ -4445,7 +4445,7 @@
     ]
    },
    "PEK": {
-    "name": "PEK",
+    "name": "Beijing",
     "airports": [
      "PEK"
     ]
@@ -4487,7 +4487,7 @@
     ]
    },
    "PVG": {
-    "name": "PVG",
+    "name": "Shanghai",
     "airports": [
      "PVG"
     ]
@@ -4511,7 +4511,7 @@
     ]
    },
    "RUH": {
-    "name": "RUH",
+    "name": "Riyadh",
     "airports": [
      "RUH"
     ]
@@ -4547,7 +4547,7 @@
     ]
    },
    "SIN": {
-    "name": "SIN",
+    "name": "Singapore",
     "airports": [
      "SIN"
     ]
@@ -4637,7 +4637,7 @@
     ]
    },
    "TPE": {
-    "name": "TPE",
+    "name": "Taipei",
     "airports": [
      "TPE"
     ]
@@ -4655,7 +4655,7 @@
     ]
    },
    "TUN": {
-    "name": "TUN",
+    "name": "Tunis",
     "airports": [
      "TUN"
     ]
@@ -4686,7 +4686,7 @@
     ]
    },
    "XIY": {
-    "name": "XIY",
+    "name": "Xi'an",
     "airports": [
      "XIY"
     ]
@@ -4698,7 +4698,7 @@
     ]
    },
    "YUL": {
-    "name": "YUL",
+    "name": "Montreal",
     "airports": [
      "YUL"
     ]
@@ -4722,7 +4722,7 @@
     ]
    },
    "ZNZ": {
-    "name": "ZNZ",
+    "name": "Zanzibar",
     "airports": [
      "ZNZ"
     ]
