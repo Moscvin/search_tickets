@@ -653,6 +653,78 @@ def search_kiwi(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
     return flights
 
 
+KIWI_ONEWAY_QUERY = """query SearchOnewayItinerariesQuery($search: SearchOnewayInput, $filter: ItinerariesFilterInput,
+  $options: ItinerariesOptionsInput) {
+  onewayItineraries(search: $search, filter: $filter, options: $options) {
+    ... on Itineraries { itineraries { ... on ItineraryOneWay {
+      price { amount }
+      sector { sectorSegments { segment { source { localTime station { code } }
+        destination { station { code city { name } } } carrier { name } } } }
+      bookingOptions { edges { node { bookingUrl } } }
+    } } }
+    ... on AppError { error: message }
+  }
+}"""
+
+
+def search_kiwi_oneway(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
+    """Doar dus (o direcție) prin Kiwi: zboruri single, fără întoarcere."""
+    headers = {"origin": "https://www.kiwi.com", "referer": "https://www.kiwi.com/"}
+    destinations = [d.strip() for d in KIWI_DESTINATIONS.split(",") if d.strip()]
+    flights = []
+    for home in ORIGINS:
+        for dest in destinations:
+            if city_of(dest) == city_of(home):
+                continue
+            variables = {
+                "search": {
+                    "itinerary": {
+                        "source": {"ids": [f"Station:airport:{home}"]},
+                        "destination": {"ids": [f"Station:airport:{dest}"]},
+                        "outboundDepartureDate": {"start": f"{max(FIRST_OUTBOUND, TODAY + dt.timedelta(days=1))}T00:00:00",
+                                                  "end": f"{LAST_OUTBOUND}T23:59:59"},
+                    },
+                    "passengers": {"adults": ADULTS, "children": CHILDREN, "infants": 0,
+                                   "adultsHoldBags": [0] * ADULTS, "adultsHandBags": [0] * ADULTS,
+                                   "childrenHoldBags": [0] * CHILDREN, "childrenHandBags": [0] * CHILDREN},
+                    "cabinClass": {"cabinClass": "ECONOMY", "applyMixedClasses": False},
+                },
+                "filter": {"transportTypes": ["FLIGHT"], "contentProviders": ["KIWI"], "limit": 10,
+                           **({"maxStopsCount": 0} if DIRECT_ONLY else {})},
+                "options": {"sortBy": "PRICE", "currency": "eur", "locale": "en", "market": "md",
+                            "partner": "skypicker", "partnerMarket": "md", "storeSearch": False,
+                            "searchStrategy": "REDUCED", "abTestInput": {}},
+            }
+            try:
+                r = s.post("https://api.skypicker.com/umbrella/v2/graphql?featureName=SearchOnewayItinerariesQuery",
+                           json={"query": KIWI_ONEWAY_QUERY, "variables": variables}, headers=headers, timeout=60)
+                r.raise_for_status()
+                result = (r.json().get("data") or {}).get("onewayItineraries") or {}
+                if result.get("error"):
+                    raise RuntimeError(result["error"])
+            except Exception as e:  # noqa: BLE001
+                log.warning("Kiwi one-way %s-%s: %s", home, dest, e)
+                continue
+            for it in result.get("itineraries") or []:
+                segs = [x["segment"] for x in it["sector"]["sectorSegments"]]
+                edges = it["bookingOptions"]["edges"]
+                if not segs or not edges:
+                    continue
+                arrival = segs[-1]["destination"]["station"]
+                names.setdefault(arrival["code"], arrival["city"]["name"])
+                carriers = list(dict.fromkeys(seg["carrier"]["name"] for seg in segs))
+                flights.append(Flight(
+                    airline=" + ".join(carriers) + " (Kiwi)", origin=home, destination=arrival["code"],
+                    date=segs[0]["source"]["localTime"][:10], home=home,
+                    price_eur=round(to_eur(float(it["price"]["amount"]), "EUR", rates) / passengers(), 2),
+                    link="https://www.kiwi.com" + edges[0]["node"]["bookingUrl"],
+                    direct=len(segs) == 1,
+                ))
+            time.sleep(0.5)
+    log.info("Kiwi: %d oferte doar dus", len(flights))
+    return flights
+
+
 # --------------------------------------------------------------------------- Aviasales (opțional)
 
 def search_aviasales(s: requests.Session, rates: dict, names: dict) -> list[Flight]:

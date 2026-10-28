@@ -375,6 +375,7 @@ def search_route(s, origins: list[str], destinations: list[str], min_days: int, 
     st.DIRECT_ONLY = True
     run(st.SOURCES)
     if min_days == 0:  # doar dus: nu există întoarcere, deci nici variante cu escală
+        run([st.search_kiwi_oneway])
         return oneway_results(flights, anywhere), [], errors
     if anywhere:  # cea mai ieftină variantă pentru fiecare oraș
         return st.cheapest_trips(flights, names), [], errors
