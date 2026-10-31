@@ -1,5 +1,5 @@
 {
- "date": "2026-10-30",
+ "date": "2026-10-31",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -468,12 +468,6 @@
      "EIN"
     ]
    },
-   "HRG": {
-    "name": "Hurghada",
-    "airports": [
-     "HRG"
-    ]
-   },
    "IST": {
     "name": "Istanbul",
     "airports": [
@@ -540,6 +534,12 @@
     "airports": [
      "CIA",
      "FCO"
+    ]
+   },
+   "SSH": {
+    "name": "Sharm El Sheikh",
+    "airports": [
+     "SSH"
     ]
    },
    "TLV": {
