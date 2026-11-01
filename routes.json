@@ -1,5 +1,5 @@
 {
- "date": "2026-10-31",
+ "date": "2026-11-01",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -3026,8 +3026,7 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW",
-     "WMI"
+     "WAW"
     ]
    },
    "VIE": {
@@ -3360,12 +3359,6 @@
     "name": "Ibiza",
     "airports": [
      "IBZ"
-    ]
-   },
-   "KLX": {
-    "name": "Kalamata",
-    "airports": [
-     "KLX"
     ]
    },
    "KTW": {
@@ -4490,12 +4483,6 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
-    ]
-   },
-   "RZE": {
-    "name": "Rzeszów",
-    "airports": [
-     "RZE"
     ]
    },
    "SDR": {
