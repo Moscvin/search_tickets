@@ -1,5 +1,5 @@
 {
- "date": "2026-11-01",
+ "date": "2026-11-02",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -534,12 +534,6 @@
     "airports": [
      "CIA",
      "FCO"
-    ]
-   },
-   "SSH": {
-    "name": "Sharm El Sheikh",
-    "airports": [
-     "SSH"
     ]
    },
    "TLV": {
@@ -2315,6 +2309,12 @@
      "BRI"
     ]
    },
+   "BIO": {
+    "name": "Bilbao",
+    "airports": [
+     "BIO"
+    ]
+   },
    "BHX": {
     "name": "Birmingham",
     "airports": [
@@ -2842,12 +2842,6 @@
      "MAN"
     ]
    },
-   "RAK": {
-    "name": "Marrakesh",
-    "airports": [
-     "RAK"
-    ]
-   },
    "MRS": {
     "name": "Marseille",
     "airports": [
@@ -3026,7 +3020,8 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW"
+     "WAW",
+     "WMI"
     ]
    },
    "VIE": {
@@ -3359,6 +3354,12 @@
     "name": "Ibiza",
     "airports": [
      "IBZ"
+    ]
+   },
+   "KLX": {
+    "name": "Kalamata",
+    "airports": [
+     "KLX"
     ]
    },
    "KTW": {
@@ -4483,6 +4484,12 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
+    ]
+   },
+   "RZE": {
+    "name": "Rzeszów",
+    "airports": [
+     "RZE"
     ]
    },
    "SDR": {
