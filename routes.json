@@ -1,5 +1,5 @@
 {
- "date": "2026-11-04",
+ "date": "2026-11-05",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -116,12 +116,6 @@
      "DTM"
     ]
    },
-   "DRS": {
-    "name": "Dresden",
-    "airports": [
-     "DRS"
-    ]
-   },
    "DXB": {
     "name": "Dubai",
     "airports": [
@@ -145,12 +139,6 @@
     "airports": [
      "FRA",
      "HHN"
-    ]
-   },
-   "GVA": {
-    "name": "Geneva",
-    "airports": [
-     "GVA"
     ]
    },
    "HAM": {
@@ -210,12 +198,6 @@
      "MAD"
     ]
    },
-   "AGP": {
-    "name": "Malaga",
-    "airports": [
-     "AGP"
-    ]
-   },
    "FMM": {
     "name": "Memmingen / Munich West",
     "airports": [
@@ -258,12 +240,6 @@
     "airports": [
      "BVA",
      "CDG"
-    ]
-   },
-   "PMF": {
-    "name": "Parma",
-    "airports": [
-     "PMF"
     ]
    },
    "PRG": {
@@ -3020,7 +2996,8 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW"
+     "WAW",
+     "WMI"
     ]
    },
    "VIE": {
@@ -3353,6 +3330,12 @@
     "name": "Ibiza",
     "airports": [
      "IBZ"
+    ]
+   },
+   "KLX": {
+    "name": "Kalamata",
+    "airports": [
+     "KLX"
     ]
    },
    "KTW": {
@@ -4477,6 +4460,12 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
+    ]
+   },
+   "RZE": {
+    "name": "Rzeszów",
+    "airports": [
+     "RZE"
     ]
    },
    "SDR": {
