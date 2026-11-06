@@ -593,7 +593,11 @@ def route_catalog(s) -> dict[str, dict[str, dict]]:
             if o in found:
                 found[o].add(d["airportCode"])
 
-    for label, fn in (("Wizz", wizz), ("Ryanair", ryanair), ("FlyOne", flyone), ("HiSky", hisky), ("SkyUp", skyup)):
+    def polaris():  # Polaris zboară doar din Chișinău; lista e cea din afișul zbor.md
+        found["RMO"].update(st.POLARIS_AIRPORTS)
+
+    for label, fn in (("Wizz", wizz), ("Ryanair", ryanair), ("FlyOne", flyone), ("HiSky", hisky), ("SkyUp", skyup),
+                      ("Polaris", polaris)):
         collect(label, fn)
     # companiile căutate prin Kiwi (Turkish, Pegasus, LOT, Lufthansa...): doar dacă Kiwi găsește un zbor direct.
     # Din Istanbul zboară multe mai multe companii, deci lista de candidați e mai mare

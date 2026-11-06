@@ -758,7 +758,67 @@ def search_aviasales(s: requests.Session, rates: dict, names: dict) -> list[Flig
     return flights
 
 
-SOURCES = [search_wizzair, search_ryanair, search_flyone, search_hisky, search_skyup, search_kiwi, search_aviasales]
+# --------------------------------------------------------------------------- Polaris (airpolaris.com)
+
+POLARIS_AIRPORTS = ["BLQ", "VRN", "PRG", "MXP", "FCO", "DUB", "IST"]  # destinațiile din Chișinău, după afișul zbor.md
+
+
+def polaris_day(origin: str, dest: str, day: dt.date) -> list[dict]:
+    """Zborurile Polaris pe o rută și o zi. API-ul caută o singură zi pe cerere."""
+    s = requests.Session(impersonate="chrome")
+    r = s.get("https://airpolaris.com/api/v1/flights/search",
+              params={"from": origin, "to": dest, "start": day.strftime("%Y/%m/%d"), "adults": 1, "child": 0, "infant": 0},
+              timeout=60)
+    r.raise_for_status()
+    flights = ((r.json().get("flights") or {}).get("aerocrs") or {}).get("flights") or {}
+    return flights.get("flight") if isinstance(flights.get("flight"), list) else []
+
+
+def search_polaris(s: requests.Session, rates: dict, names: dict) -> list[Flight]:
+    """Polaris zboară doar din Chișinău. Orarul e rar, deci verificăm fiecare zi din perioadă."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    def days(first: dt.date, last: dt.date) -> list[dt.date]:
+        return [first + dt.timedelta(days=i) for i in range((last - first).days + 1)]
+
+    jobs = []  # (origine, destinație, zi)
+    for dest in POLARIS_AIRPORTS:
+        if "RMO" in ORIGINS:
+            jobs += [("RMO", dest, d) for d in days(max(FIRST_OUTBOUND, TODAY), LAST_OUTBOUND)]
+            jobs += [(dest, "RMO", d) for d in days(max(FIRST_OUTBOUND, TODAY), LAST_DATE)]
+
+    def run(job: tuple) -> list[Flight]:
+        origin, dest, day = job
+        try:
+            raw = polaris_day(origin, dest, day)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Polaris %s-%s %s: %s", origin, dest, day, e)
+            return []
+        found = []
+        for f in raw:
+            economy = [c for c in (f.get("classes") or {}).values() if c.get("cabinCode") == "ECO" and c.get("fare")]
+            if not economy:
+                continue
+            # prețul per adult, cu taxe, în USD (API), convertit în EUR
+            prices = [to_eur(float(c["fare"]["adultFare"]) + float(c["fare"]["tax"]), c.get("currency", "USD"), rates)
+                      for c in economy]
+            found.append(Flight(
+                airline="Polaris", origin=f["fromcode"], destination=f["tocode"],
+                date=f["STD"][:10].replace("/", "-"), home="RMO", price_eur=min(prices),
+                link=f["deeplink"], direct=f.get("flighttype") == "Direct",
+            ))
+        return found
+
+    flights = []
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for found in pool.map(run, jobs):
+            flights.extend(found)
+    log.info("Polaris: %d zboruri", len(flights))
+    return flights
+
+
+SOURCES = [search_wizzair, search_ryanair, search_flyone, search_hisky, search_skyup, search_kiwi, search_aviasales,
+           search_polaris]
 
 
 # --------------------------------------------------------------------------- combinare dus + întors
