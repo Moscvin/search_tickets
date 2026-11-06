@@ -782,7 +782,7 @@ def search_polaris(s: requests.Session, rates: dict, names: dict) -> list[Flight
         return [first + dt.timedelta(days=i) for i in range((last - first).days + 1)]
 
     jobs = []  # (origine, destinație, zi)
-    for dest in POLARIS_AIRPORTS:
+    for dest in filter(wanted, POLARIS_AIRPORTS):  # doar destinațiile cerute de rută, dacă e o rută anume
         if "RMO" in ORIGINS:
             jobs += [("RMO", dest, d) for d in days(max(FIRST_OUTBOUND, TODAY), LAST_OUTBOUND)]
             jobs += [(dest, "RMO", d) for d in days(max(FIRST_OUTBOUND, TODAY), LAST_DATE)]
