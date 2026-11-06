@@ -87,6 +87,7 @@ COUNTRIES = {
     "JO": ("🇯🇴 Iordania", "Iordania", ["AMM"]),
     "LB": ("🇱🇧 Liban", "Liban", ["BEY"]),
     "IQ": ("🇮🇶 Irak", "Irak", ["BGW", "EBL"]),
+    "TR": ("🇹🇷 Turcia", "Turcia", ["IST", "SAW", "AYT", "ADB", "ESB", "ANK", "ASR", "GZT", "TZX", "VAN", "DLM"]),
     "EG": ("🇪🇬 Egipt", "Egipt", ["CAI", "HRG", "SSH"]),
     "TN": ("🇹🇳 Tunisia", "Tunisia", ["TUN"]),
     "DZ": ("🇩🇿 Algeria", "Algeria", ["ALG", "ORN"]),

@@ -40,6 +40,7 @@ const COUNTRIES = {
   TN: ["🇹🇳 Tunisia", ["TUN"]],
   DZ: ["🇩🇿 Algeria", ["ALG", "ORN"]],
   MA: ["🇲🇦 Maroc", ["CMN", "RAK"]],
+  TR: ["🇹🇷 Turcia", ["IST", "SAW", "AYT", "ADB", "ESB", "ANK", "ASR", "GZT", "TZX", "VAN", "DLM"]],
   ET: ["🇪🇹 Etiopia", ["ADD"]],
   KE: ["🇰🇪 Kenya", ["NBO", "MBA"]],
   TZ: ["🇹🇿 Tanzania", ["DAR", "JRO", "ZNZ"]],
