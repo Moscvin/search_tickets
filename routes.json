@@ -1,5 +1,5 @@
 {
- "date": "2026-11-08",
+ "date": "2026-11-09",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -444,6 +444,12 @@
      "EIN"
     ]
    },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
+    ]
+   },
    "IST": {
     "name": "Istanbul",
     "airports": [
@@ -510,6 +516,12 @@
     "airports": [
      "CIA",
      "FCO"
+    ]
+   },
+   "SSH": {
+    "name": "Sharm El Sheikh",
+    "airports": [
+     "SSH"
     ]
    },
    "TLV": {
@@ -2381,6 +2393,12 @@
      "HEL"
     ]
    },
+   "HER": {
+    "name": "Heraklion (Crete)",
+    "airports": [
+     "HER"
+    ]
+   },
    "CGN": {
     "name": "Köln",
     "airports": [
@@ -2996,7 +3014,8 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW"
+     "WAW",
+     "WMI"
     ]
    },
    "VIE": {
@@ -3025,12 +3044,6 @@
    }
   },
   "BGY": {
-   "AAR": {
-    "name": "Aarhus",
-    "airports": [
-     "AAR"
-    ]
-   },
    "AGA": {
     "name": "Agadir",
     "airports": [
@@ -3337,6 +3350,12 @@
      "IBZ"
     ]
    },
+   "KLX": {
+    "name": "Kalamata",
+    "airports": [
+     "KLX"
+    ]
+   },
    "KTW": {
     "name": "Katowice",
     "airports": [
@@ -3620,12 +3639,6 @@
      "SVQ"
     ]
    },
-   "SNN": {
-    "name": "Shannon",
-    "airports": [
-     "SNN"
-    ]
-   },
    "SHJ": {
     "name": "Sharjah",
     "airports": [
@@ -3809,12 +3822,6 @@
      "AUH"
     ]
    },
-   "ADD": {
-    "name": "Addis Abeba",
-    "airports": [
-     "ADD"
-    ]
-   },
    "AGA": {
     "name": "Agadir",
     "airports": [
@@ -3843,12 +3850,6 @@
     "name": "Almaty",
     "airports": [
      "ALA"
-    ]
-   },
-   "AMM": {
-    "name": "Amman",
-    "airports": [
-     "AMM"
     ]
    },
    "AMS": {
@@ -4543,12 +4544,6 @@
     "name": "Sofia",
     "airports": [
      "SOF"
-    ]
-   },
-   "STO": {
-    "name": "Stockholm",
-    "airports": [
-     "ARN"
     ]
    },
    "STR": {
