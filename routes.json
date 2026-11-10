@@ -1,5 +1,5 @@
 {
- "date": "2026-11-09",
+ "date": "2026-11-10",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -442,12 +442,6 @@
     "name": "Eindhoven",
     "airports": [
      "EIN"
-    ]
-   },
-   "HRG": {
-    "name": "Hurghada",
-    "airports": [
-     "HRG"
     ]
    },
    "IST": {
@@ -2297,12 +2291,6 @@
      "BRI"
     ]
    },
-   "BIO": {
-    "name": "Bilbao",
-    "airports": [
-     "BIO"
-    ]
-   },
    "BHX": {
     "name": "Birmingham",
     "airports": [
@@ -3822,6 +3810,12 @@
      "AUH"
     ]
    },
+   "ADD": {
+    "name": "Addis Abeba",
+    "airports": [
+     "ADD"
+    ]
+   },
    "AGA": {
     "name": "Agadir",
     "airports": [
@@ -3850,6 +3844,12 @@
     "name": "Almaty",
     "airports": [
      "ALA"
+    ]
+   },
+   "AMM": {
+    "name": "Amman",
+    "airports": [
+     "AMM"
     ]
    },
    "AMS": {
@@ -4544,6 +4544,18 @@
     "name": "Sofia",
     "airports": [
      "SOF"
+    ]
+   },
+   "SPU": {
+    "name": "Split",
+    "airports": [
+     "SPU"
+    ]
+   },
+   "STO": {
+    "name": "Stockholm",
+    "airports": [
+     "ARN"
     ]
    },
    "STR": {
