@@ -1,5 +1,5 @@
 {
- "date": "2026-11-10",
+ "date": "2026-11-11",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -510,12 +510,6 @@
     "airports": [
      "CIA",
      "FCO"
-    ]
-   },
-   "SSH": {
-    "name": "Sharm El Sheikh",
-    "airports": [
-     "SSH"
     ]
    },
    "TLV": {
@@ -2289,6 +2283,12 @@
     "name": "Bari",
     "airports": [
      "BRI"
+    ]
+   },
+   "BIO": {
+    "name": "Bilbao",
+    "airports": [
+     "BIO"
     ]
    },
    "BHX": {
