@@ -1,5 +1,5 @@
 {
- "date": "2026-11-12",
+ "date": "2026-11-13",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -164,6 +164,12 @@
     "airports": [
      "IST",
      "SAW"
+    ]
+   },
+   "ADB": {
+    "name": "Izmir",
+    "airports": [
+     "ADB"
     ]
    },
    "CGN": {
@@ -1826,12 +1832,6 @@
      "MED"
     ]
    },
-   "MEL": {
-    "name": "Melbourne",
-    "airports": [
-     "MEL"
-    ]
-   },
    "MIA": {
     "name": "Miami",
     "airports": [
@@ -2283,6 +2283,12 @@
     "name": "Bari",
     "airports": [
      "BRI"
+    ]
+   },
+   "BIO": {
+    "name": "Bilbao",
+    "airports": [
+     "BIO"
     ]
    },
    "BHX": {
@@ -4471,12 +4477,6 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
-    ]
-   },
-   "RZE": {
-    "name": "Rzeszów",
-    "airports": [
-     "RZE"
     ]
    },
    "SDR": {
