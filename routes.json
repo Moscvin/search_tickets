@@ -1,5 +1,5 @@
 {
- "date": "2026-11-13",
+ "date": "2026-11-14",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -3002,7 +3002,8 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW"
+     "WAW",
+     "WMI"
     ]
    },
    "VIE": {
@@ -3031,12 +3032,6 @@
    }
   },
   "BGY": {
-   "AAR": {
-    "name": "Aarhus",
-    "airports": [
-     "AAR"
-    ]
-   },
    "AGA": {
     "name": "Agadir",
     "airports": [
@@ -3343,6 +3338,12 @@
      "IBZ"
     ]
    },
+   "KLX": {
+    "name": "Kalamata",
+    "airports": [
+     "KLX"
+    ]
+   },
    "KTW": {
     "name": "Katowice",
     "airports": [
@@ -3624,12 +3625,6 @@
     "name": "Seville",
     "airports": [
      "SVQ"
-    ]
-   },
-   "SNN": {
-    "name": "Shannon",
-    "airports": [
-     "SNN"
     ]
    },
    "SHJ": {
@@ -4477,6 +4472,12 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
+    ]
+   },
+   "RZE": {
+    "name": "Rzeszów",
+    "airports": [
+     "RZE"
     ]
    },
    "SDR": {
