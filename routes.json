@@ -1,5 +1,5 @@
 {
- "date": "2026-11-15",
+ "date": "2026-11-16",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -1832,6 +1832,12 @@
      "MED"
     ]
    },
+   "MEL": {
+    "name": "Melbourne",
+    "airports": [
+     "MEL"
+    ]
+   },
    "MIA": {
     "name": "Miami",
     "airports": [
@@ -2283,6 +2289,12 @@
     "name": "Bari",
     "airports": [
      "BRI"
+    ]
+   },
+   "BIO": {
+    "name": "Bilbao",
+    "airports": [
+     "BIO"
     ]
    },
    "BHX": {
@@ -2996,8 +3008,7 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW",
-     "WMI"
+     "WAW"
     ]
    },
    "VIE": {
@@ -4472,6 +4483,12 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
+    ]
+   },
+   "RZE": {
+    "name": "Rzeszów",
+    "airports": [
+     "RZE"
     ]
    },
    "SDR": {
