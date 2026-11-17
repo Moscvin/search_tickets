@@ -1,5 +1,5 @@
 {
- "date": "2026-11-16",
+ "date": "2026-11-17",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -245,7 +245,8 @@
     "name": "Paris",
     "airports": [
      "BVA",
-     "CDG"
+     "CDG",
+     "ORY"
     ]
    },
    "PRG": {
@@ -1832,12 +1833,6 @@
      "MED"
     ]
    },
-   "MEL": {
-    "name": "Melbourne",
-    "airports": [
-     "MEL"
-    ]
-   },
    "MIA": {
     "name": "Miami",
     "airports": [
@@ -2955,6 +2950,12 @@
     "name": "Stockholm",
     "airports": [
      "ARN"
+    ]
+   },
+   "STR": {
+    "name": "Stuttgart",
+    "airports": [
+     "STR"
     ]
    },
    "SCV": {
