@@ -1,5 +1,5 @@
 {
- "date": "2026-11-17",
+ "date": "2026-11-18",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -451,6 +451,12 @@
      "EIN"
     ]
    },
+   "HRG": {
+    "name": "Hurghada",
+    "airports": [
+     "HRG"
+    ]
+   },
    "IST": {
     "name": "Istanbul",
     "airports": [
@@ -517,6 +523,12 @@
     "airports": [
      "CIA",
      "FCO"
+    ]
+   },
+   "SSH": {
+    "name": "Sharm El Sheikh",
+    "airports": [
+     "SSH"
     ]
    },
    "TLV": {
@@ -3850,12 +3862,6 @@
     "name": "Alicante",
     "airports": [
      "ALC"
-    ]
-   },
-   "ALA": {
-    "name": "Almaty",
-    "airports": [
-     "ALA"
     ]
    },
    "AMM": {
