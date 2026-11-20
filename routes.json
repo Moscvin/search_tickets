@@ -1,5 +1,5 @@
 {
- "date": "2026-11-19",
+ "date": "2026-11-20",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -449,12 +449,6 @@
     "name": "Eindhoven",
     "airports": [
      "EIN"
-    ]
-   },
-   "HRG": {
-    "name": "Hurghada",
-    "airports": [
-     "HRG"
     ]
    },
    "IST": {
@@ -2292,6 +2286,12 @@
      "BRI"
     ]
    },
+   "BIO": {
+    "name": "Bilbao",
+    "airports": [
+     "BIO"
+    ]
+   },
    "BHX": {
     "name": "Birmingham",
     "airports": [
@@ -3009,7 +3009,8 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW"
+     "WAW",
+     "WMI"
     ]
    },
    "VIE": {
@@ -3390,6 +3391,12 @@
     "name": "Kraków",
     "airports": [
      "KRK"
+    ]
+   },
+   "KWI": {
+    "name": "Kuweit",
+    "airports": [
+     "KWI"
     ]
    },
    "SUF": {
