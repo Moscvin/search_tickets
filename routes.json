@@ -1,5 +1,5 @@
 {
- "date": "2026-11-20",
+ "date": "2026-11-21",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -3009,8 +3009,7 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW",
-     "WMI"
+     "WAW"
     ]
    },
    "VIE": {
