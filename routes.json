@@ -1,5 +1,5 @@
 {
- "date": "2026-11-22",
+ "date": "2026-11-23",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -4484,6 +4484,12 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
+    ]
+   },
+   "RZE": {
+    "name": "Rzeszów",
+    "airports": [
+     "RZE"
     ]
    },
    "SDR": {
