@@ -1,5 +1,5 @@
 {
- "date": "2026-11-23",
+ "date": "2026-11-24",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -595,7 +595,7 @@
     ]
    },
    "ARW": {
-    "name": "Arad",
+    "name": "ARW",
     "airports": [
      "ARW"
     ]
@@ -2547,12 +2547,6 @@
      "AMS"
     ]
    },
-   "ARW": {
-    "name": "Arad",
-    "airports": [
-     "ARW"
-    ]
-   },
    "ATH": {
     "name": "Atena",
     "airports": [
@@ -3066,12 +3060,6 @@
     "name": "Amman",
     "airports": [
      "AMM"
-    ]
-   },
-   "ARW": {
-    "name": "Arad",
-    "airports": [
-     "ARW"
     ]
    },
    "ATH": {
@@ -4380,6 +4368,12 @@
     "name": "New York",
     "airports": [
      "JFK"
+    ]
+   },
+   "EWR": {
+    "name": "Newark",
+    "airports": [
+     "EWR"
     ]
    },
    "NUE": {
