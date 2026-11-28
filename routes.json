@@ -1,5 +1,5 @@
 {
- "date": "2026-11-27",
+ "date": "2026-11-28",
  "catalog": {
   "RMO": {
    "ALC": {
@@ -60,6 +60,12 @@
     "name": "Berlin Brandenburg",
     "airports": [
      "BER"
+    ]
+   },
+   "BJV": {
+    "name": "Bodrum",
+    "airports": [
+     "BJV"
     ]
    },
    "BLQ": {
@@ -517,6 +523,12 @@
     "airports": [
      "CIA",
      "FCO"
+    ]
+   },
+   "SSH": {
+    "name": "Sharm El Sheikh",
+    "airports": [
+     "SSH"
     ]
    },
    "TLV": {
@@ -2997,7 +3009,8 @@
    "WAW": {
     "name": "Varșovia",
     "airports": [
-     "WAW"
+     "WAW",
+     "WMI"
     ]
    },
    "VIE": {
@@ -4472,12 +4485,6 @@
     "name": "Riyadh",
     "airports": [
      "RUH"
-    ]
-   },
-   "RZE": {
-    "name": "Rzeszów",
-    "airports": [
-     "RZE"
     ]
    },
    "SDR": {
